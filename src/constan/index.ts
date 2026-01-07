@@ -55,3 +55,42 @@ export const maritalStatus = [
     display: "Widowed",
   },
 ] as const;
+
+export const organizationTypes = {
+  dept: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "dept",
+    coding_display: "Hospital Department",
+    keterangan: "Departemen Dalam Rumah Sakit",
+  },
+  team: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "team",
+    coding_display: "Organizational Team",
+    keterangan: "Kelompok praktisi/tenaga kesehatan dalam organisasi",
+  },
+  prov: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "prov",
+    coding_display: "Healthcare Provider",
+    keterangan: "Fasilitas Pelayanan Kesehatan",
+  },
+  govt: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "govt",
+    coding_display: "Government",
+    keterangan: "Organisasi Pemerintah",
+  },
+  ins: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "ins",
+    coding_display: "Insurance Company",
+    keterangan: "Perusahaan Asuransi",
+  },
+  other: {
+    coding_system: "http://terminology.hl7.org/CodeSystem/organization-type",
+    coding_code: "other",
+    coding_display: "Other",
+    keterangan: "Lain-lain",
+  },
+} as const;

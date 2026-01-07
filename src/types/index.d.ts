@@ -1,4 +1,4 @@
-import { maritalStatus } from "../constan";
+import { maritalStatus, organizationTypes } from "../constan";
 
 export {};
 
@@ -181,5 +181,79 @@ declare global {
       value: string;
     }>;
     address?: unknown[];
+  }
+
+  //organization dto
+  type OrganisationTypeCode =
+    (typeof organizationTypes)[keyof typeof organizationTypes]["coding_code"];
+
+  interface OrganizationInput {
+    active?: boolean;
+
+    identifier_value: string;
+    partOf?: string;
+
+    type_code: OrganisationTypeCode;
+    name: string;
+
+    phone?: string;
+    email?: string;
+    url?: string;
+
+    street?: string;
+    city?: string;
+    postalCode?: string;
+
+    provincecode?: string;
+    citycode?: string;
+    districtcode?: string;
+    villagecode?: string;
+  }
+
+  interface FhirOrganization {
+    resourceType: "Organization";
+    active: boolean;
+
+    identifier: Array<{
+      use: "official";
+      system: string;
+      value: string;
+    }>;
+
+    type: Array<{
+      coding: Array<{
+        system: string;
+        code: string;
+        display: string;
+      }>;
+    }>;
+
+    name: string;
+
+    telecom?: Array<{
+      system: "phone" | "email" | "url";
+      value: string;
+      use: "work";
+    }>;
+
+    address?: Array<{
+      use: "work";
+      type: "both";
+      line: string[];
+      city: string;
+      postalCode: string;
+      country: "ID";
+      extension: Array<{
+        url: string;
+        extension: Array<{
+          url: string;
+          valueCode: string;
+        }>;
+      }>;
+    }>;
+
+    partOf?: {
+      reference: string;
+    };
   }
 }

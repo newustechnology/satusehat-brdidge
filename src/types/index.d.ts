@@ -1,132 +1,121 @@
+import { mariedStatus } from "../constan";
+
 export {};
 
 declare global {
-  interface BundleRM1Input {
-    patientId: string;
-    patientName: string;
-    practitionerId: string;
-    organizationId: string;
-    organizationName: string;
-    encounterStart: string; // ISO date
-    encounterEnd: string; // ISO date
-    height?: number;
-    weight?: number;
-    conditionCode: string;
-    conditionDisplay: string;
-    procedureCode: string;
-    procedureDisplay: string;
-    compositionTitle: string;
-  }
+  // requires
 
-  interface BundleRM2Input {
-    patientId: string;
-    patientName: string;
-    practitionerId: string;
-    organizationId: string;
-    organizationName: string;
-    encounterStart: string; // ISO date
-    encounterEnd: string; // ISO date
-    height?: number;
-    weight?: number;
-    conditionCode: string;
-    conditionDisplay: string;
-    procedureCode: string;
-    procedureDisplay: string;
-    compositionTitle: string;
-    medicationCode: string;
-    medicationDisplay: string;
-    medicationFormCode: string;
-    medicationFormDisplay: string;
-    ingredientList: Array<{ code: string; display: string; value: number }>;
-    prescriptionCode: string;
-    prescriptionDisplay: string;
-    dosageText: string;
-    dispenseQuantity: number;
-    dispenseDuration: number;
-  }
+  //patient dto
+  type MariedStatusIdentifire = (typeof mariedStatus)[number]["indentifire"];
 
-  interface BundleRMDTOData {
-    patientId: string;
-    patientName: string;
-    practitionerId: string;
-    practitionerName: string;
-    organizationId: string;
-    encounterStart: string;
-    encounterEnd: string;
-    locationId: string;
-    locationName: string;
-    systolic?: number;
-    diastolic?: number;
-    temperature?: number;
-    heartrate?: number;
-    respiratoryrate?: number;
-    height?: number;
-    weight?: number;
-    diagnosis?: Condition[];
-    procedures?: Procedure[];
-    compositionTitle: string;
-    medications?: Medication[];
-  }
-
-  interface BundleRMDTOOptions {
-    skipResources?: string[];
-    overrideEncounterIdentifier?: string;
-    overrideCompositionIdentifier?: string;
-    overrideMedicationIdentifiers?: Array<{
-      medCode: string;
-      index: number;
-      request?: string;
-      dispense?: string;
+  interface CreatePatientInput {
+    nik: string;
+    name: string;
+    gender: "male" | "female" | "other" | "unknown";
+    birthDate: string; // YYYY-MM-DD
+    deceasedBoolean?: boolean;
+    contact?: Array<{
+      type: "phone" | "email";
+      value: string;
     }>;
-    autoGenerateAllIdentifiers?: boolean;
-    allowDuplicateSkip?: boolean;
+
+    // Address
+    addressLine: string;
+    city: string;
+    postalCode?: string;
+    country: string;
+
+    provinceCode: string;
+    cityCode: string;
+    districtCode: string;
+    villageCode: string;
+    rw: string;
+    rt: string;
+
+    // Marital
+    maritalStatus: MariedStatusIdentifire; // ex: "Kawin", "Belum Kawin", "Cerai Hidup"
+
+    // Birth
+    multipleBirthInteger?: number;
+
+    // Emergency Contact
+    contactName: string;
+    contactPhone: string;
   }
 
-  interface Medication {
-    code: string;
-    display: string;
-    formCode: string;
-    formDisplay: string;
-    dosageText: string;
-    unitCode?: string;
-    ingredientList: Array<{
-      code: string;
-      display: string;
-      value: number;
-      uom_name: string;
-      per: number;
+  export interface FhirCreatePatient {
+    resourceType: "Patient";
+    meta: {
+      profile: string[];
+    };
+    identifier: Array<{
+      use: "official";
+      system: string;
+      value: string;
     }>;
-    dispenseDuration: number;
-    dispenseQuantity: number;
+    active: boolean;
+    name: Array<{
+      use: "official";
+      text: string;
+    }>;
+    telecom?: Array<{
+      system: "phone" | "email" | "fax" | "pager";
+      value: string;
+      use: "home" | "work" | "temp" | "old" | "mobile";
+    }>;
+    gender: "male" | "female" | "other" | "unknown";
+    birthDate: string;
+    deceasedBoolean?: boolean;
+    address: Array<{
+      use: "home";
+      line: string[];
+      city: string;
+      postalCode?: string;
+      country: string;
+      extension: Array<{
+        url: string;
+        extension: Array<{
+          url: string;
+          valueCode: string;
+        }>;
+      }>;
+    }>;
+    maritalStatus: {
+      coding: Array<{
+        system: string;
+        code: string;
+        display: string;
+      }>;
+      text: string;
+    };
+    multipleBirthInteger?: number;
+    contact: Array<{
+      relationship: Array<{
+        coding: Array<{
+          system: string;
+          code: string;
+        }>;
+      }>;
+      name: {
+        use: "official";
+        text: string;
+      };
+      telecom: Array<{
+        system: "phone";
+        value: string;
+        use: "mobile";
+      }>;
+    }>;
+    communication: Array<{
+      language: {
+        coding: Array<{
+          system: string;
+          code: string;
+          display: string;
+        }>;
+        text: string;
+      };
+      preferred: boolean;
+    }>;
   }
-
-  interface CompositionData {
-    resourceType?: string;
-    identifier: string;
-    status: string;
-    type: string;
-    category?: string[];
-    subject: string;
-    encounter: string;
-    date: string;
-    author?: string[];
-    title: string;
-    custodian: string;
-    section?: Section[];
-  }
-
-  interface Section {
-    title: string;
-    content: string;
-  }
-}
-
-interface Procedure {
-  code: string;
-  display: string;
-}
-
-interface Condition {
-  code: string;
-  display: string;
 }

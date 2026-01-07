@@ -1,51 +1,51 @@
-export const mariedStatus = [
+export const maritalStatus = [
   {
-    indentifire: "Dibatalkan",
+    identifier: "Dibatalkan",
     code: "A",
     display: "Annulled",
   },
   {
-    indentifire: "Cerai Hidup",
+    identifier: "Cerai Hidup",
     code: "D",
     display: "Divorced",
   },
   {
-    indentifire: "Putusan Sela",
+    identifier: "Putusan Sela",
     code: "I",
     display: "Interlocutory",
   },
   {
-    indentifire: "Pisah Hukum",
+    identifier: "Pisah Hukum",
     code: "L",
     display: "Legally Separated",
   },
   {
-    indentifire: "Kawin",
+    identifier: "Kawin",
     code: "M",
     display: "Married",
   },
   {
-    indentifire: "Kawin Adat",
+    identifier: "Kawin Adat",
     code: "C",
     display: "Common Law",
   },
   {
-    indentifire: "Poligami",
+    identifier: "Poligami",
     code: "P",
     display: "Polygamous",
   },
   {
-    indentifire: "Pasangan Domestik",
+    identifier: "Pasangan Domestik",
     code: "T",
     display: "Domestic Partner",
   },
   {
-    indentifire: "Belum Kawin",
+    identifier: "Belum Kawin",
     code: "U",
     display: "Unmarried",
   },
   {
-    indentifire: "Tidak Pernah Kawin",
+    identifier: "Tidak Pernah Kawin",
     code: "S",
     display: "Never Married",
   },
@@ -55,5 +55,3 @@ export const mariedStatus = [
     display: "Widowed",
   },
 ] as const;
-
-

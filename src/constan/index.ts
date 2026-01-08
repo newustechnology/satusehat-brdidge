@@ -131,3 +131,72 @@ export const contactPurpose = [
       "Dedicated contact point for matters relating to press enquiries.",
   },
 ] as const;
+
+export const patientContactRelationship = [
+  {
+    code: "BP",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Billing contact person",
+    definition: "Billing contact person",
+  },
+  {
+    code: "CP",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Contact person",
+    definition: "Contact person",
+  },
+  {
+    code: "EP",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Emergency contact person",
+    definition: "Emergency contact person",
+  },
+  {
+    code: "PR",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Person preparing referral",
+    definition: "Person preparing referral",
+  },
+  {
+    code: "E",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Employer",
+    definition: "Employer",
+  },
+  {
+    code: "C",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Emergency Contact",
+    definition: "Emergency Contact",
+  },
+  {
+    code: "F",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Federal Agency",
+    definition: "Federal Agency",
+  },
+  {
+    code: "I",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Insurance Company",
+    definition: "Insurance Company",
+  },
+  {
+    code: "N",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Next-of-Kin",
+    definition: "Next-of-Kin",
+  },
+  {
+    code: "S",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "State Agency",
+    definition: "State Agency",
+  },
+  {
+    code: "U",
+    system: "http://terminology.hl7.org/CodeSystem/v2-0131",
+    display: "Unknown",
+    definition: "Unknown",
+  },
+] as const;

@@ -1,4 +1,9 @@
-import { contactPurpose, maritalStatus, organizationTypes } from "../constan";
+import {
+  contactPurpose,
+  maritalStatus,
+  organizationTypes,
+  patientContactRelationship,
+} from "../constan";
 
 export {};
 
@@ -8,6 +13,8 @@ declare global {
   //patient dto
   type MariedStatusIdentifier = (typeof maritalStatus)[number]["identifier"];
   type MaritalStatusCode = (typeof maritalStatus)[number]["code"];
+  type patientContactRelationshipCode =
+    (typeof patientContactRelationship)[number]["code"];
 
   interface CreatePatientInput {
     nik: string;
@@ -54,21 +61,18 @@ declare global {
   }
 
   interface ContactInterface {
-    relationship: Array<{
-      coding: Array<{
-        system: string;
-        code: string;
-      }>;
-    }>;
-    name: {
-      use: "official";
-      text: string;
-    };
-    telecom: Array<{
-      system: "phone" | "email" | "fax" | "pager";
-      value: string;
-      use: "mobile" | "home" | "work" | "temp" | "old";
-    }>;
+    relationship?: Array<FhirCodeableConcept<patientContactRelationshipCode>>;
+    name?: FhirHumanName;
+    telecom?: Array<FhirContactPoint>;
+    address?: FhirAddress;
+    gender?: "male" | "female" | "other" | "unknown";
+    organization?: FhirReference;
+    period?: FhirPeriod;
+  }
+
+  interface CommunicationInterface {
+    language?: FhirCodeableConcept<string>;
+    preferred: boolean;
   }
 
   interface FhirPatchPatient {
@@ -102,7 +106,7 @@ declare global {
     address?: unknown[];
   }
 
-  interface FhirCreatePatient {
+  interface FhirPatient {
     resourceType: "Patient";
     meta: {
       profile: string[];
@@ -117,18 +121,16 @@ declare global {
     deceasedDateTime?: string; // dateTime
     address?: Array<FhirAddress>;
     maritalStatus?: FhirCodeableConcept<MaritalStatusCode>;
+    multipleBirthBoolean?: boolean;
     multipleBirthInteger?: number;
+    photo?: Array<FhirAttachment>;
     contact?: ContactInterface[];
-    communication: Array<{
-      language: {
-        coding: Array<{
-          system: string;
-          code: string;
-          display: string;
-        }>;
-        text: string;
-      };
-      preferred: boolean;
+    communication?: Array<CommunicationInterface>;
+    generalPractitioner?: Array<FhirReference>;
+    managingOrganization?: FhirReference;
+    link?: Array<{
+      other?: FhirReference;
+      type: string;
     }>;
     extension?: Array<{
       url: string;

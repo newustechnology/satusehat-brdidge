@@ -181,7 +181,7 @@ export class PatientDto {
   formatCreatePayload(
     createBy: "nik" | "mother_nik",
     data: CreatePatientInput
-  ): FhirCreatePatient {
+  ): FhirPatient {
     const nameParts = data.name.split(/\s+/);
     const family = nameParts.length > 1 ? nameParts.slice(-1)[0] : undefined;
     const given =

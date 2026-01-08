@@ -1,3 +1,5 @@
+import { maritalStatus } from "../../constan";
+
 export class PatientDto {
   private buildIdentifier(
     createBy: "nik" | "mother_nik",
@@ -43,18 +45,10 @@ export class PatientDto {
     return identifierArray.length > 0 ? identifierArray : undefined;
   }
 
-  private buildMaritalStatus(maritalStatus: MarriedStatusIdentifier): {
-    coding: Array<{
-      system: string;
-      code: string;
-      display: string;
-    }>;
-    text: string;
-  } {
-    const maritalData = maritalStatus.find(
-      (item: (typeof maritalStatus)[number]) =>
-        item.identifier === maritalStatus
-    )!;
+  private buildMaritalStatus(
+    data: MariedStatusIdentifier
+  ): FhirCodeableConcept<MaritalStatusCode> {
+    const maritalData = maritalStatus.find((item) => item.identifier === data)!;
     return {
       coding: [
         {
@@ -133,26 +127,12 @@ export class PatientDto {
       rt: string;
       rw: string;
     };
-  }):
-    | Array<{
-        use: "home";
-        line: string[];
-        city: string;
-        postalCode?: string;
-        country: string;
-        extension: Array<{
-          url: string;
-          extension: Array<{
-            url: string;
-            valueCode: string;
-          }>;
-        }>;
-      }>
-    | undefined {
+  }): Array<FhirAddress> | undefined {
     if (!address) return undefined;
     return [
       {
         use: "home" as const,
+        type: "physical",
         line: [...(address.line ?? [])],
         city: address.city,
         postalCode: address.postalCode,

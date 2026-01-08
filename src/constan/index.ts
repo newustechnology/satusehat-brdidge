@@ -50,7 +50,7 @@ export const maritalStatus = [
     display: "Never Married",
   },
   {
-    indentifire: "Cerai Mati",
+    identifier: "Cerai Mati",
     code: "W",
     display: "Widowed",
   },
@@ -94,3 +94,40 @@ export const organizationTypes = {
     keterangan: "Lain-lain",
   },
 } as const;
+
+export const contactPurpose = [
+  {
+    code: "BILL",
+    display: "Billing",
+    definition:
+      "Contact details for information regarding to billing/general finance enquiries.",
+  },
+  {
+    code: "ADMIN",
+    display: "Administrative",
+    definition: "Contact details for administrative enquiries.",
+  },
+  {
+    code: "HR",
+    display: "Human Resource",
+    definition:
+      "Contact details for issues related to Human Resources, such as staff matters, OH&S etc.",
+  },
+  {
+    code: "PAYOR",
+    display: "Payor",
+    definition:
+      "Contact details for dealing with issues related to insurance claims/adjudication/payment.",
+  },
+  {
+    code: "PATINF",
+    display: "Patient",
+    definition: "Generic information contact for patients.",
+  },
+  {
+    code: "PRESS",
+    display: "Press",
+    definition:
+      "Dedicated contact point for matters relating to press enquiries.",
+  },
+] as const;

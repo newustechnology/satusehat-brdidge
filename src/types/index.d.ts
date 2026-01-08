@@ -1,259 +1,346 @@
-import { maritalStatus, organizationTypes } from "../constan";
-
 export {};
 
 declare global {
-  // requires
-
-  //patient dto
-  type MarriedStatusIdentifier = (typeof maritalStatus)[number]["identifier"];
-
-  interface CreatePatientInput {
-    nik: string;
-    kk?: string;
-
-    name: string;
-    gender: "male" | "female" | "other" | "unknown";
-    birthDate: string; // YYYY-MM-DD
-    birthPlace?: {
-      city: string;
-      province: string;
-    };
-
-    deceased?: boolean;
-
-    telecom?: Array<{
-      type: "phone" | "email";
-      value: string;
-    }>;
-
-    contact?: Array<{
-      name: string;
-      type: "phone" | "email";
-      value: string;
-    }>;
-
-    address: {
-      line: string;
-      city: string;
-      postalCode?: string;
-      country: string;
-
-      provinceCode: string;
-      cityCode: string;
-      districtCode: string;
-      villageCode: string;
-      rt: string;
-      rw: string;
-    };
-
-    maritalStatus: MarriedStatusIdentifier;
-
-    multipleBirthInteger?: number;
-  }
-
-  export interface FhirCreatePatient {
-    resourceType: "Patient";
-    meta: {
-      profile: string[];
-    };
-    identifier?: Array<{
-      use: "official";
-      system: string;
-      value: string;
-    }>;
-    active: boolean;
-    name: Array<{
-      use: "official";
-      text: string;
-      family?: string;
-      given?: string[];
-    }>;
-    telecom?: Array<{
-      system: "phone" | "email" | "fax" | "pager";
-      value: string;
-      use: "home" | "work" | "temp" | "old" | "mobile";
-    }>;
-    gender: "male" | "female" | "other" | "unknown";
-    birthDate: string;
-    deceasedBoolean?: boolean;
-    address: Array<{
-      use: "home";
-      line: string[];
-      city: string;
-      postalCode?: string;
-      country: string;
-      extension: Array<{
-        url: string;
-        extension: Array<{
-          url: string;
-          valueCode: string;
-        }>;
-      }>;
-    }>;
-    maritalStatus: {
-      coding: Array<{
-        system: string;
-        code: string;
-        display: string;
-      }>;
-      text: string;
-    };
-    multipleBirthInteger?: number;
-    contact?: ContactInterface[];
-    communication: Array<{
-      language: {
-        coding: Array<{
-          system: string;
-          code: string;
-          display: string;
-        }>;
-        text: string;
-      };
-      preferred: boolean;
-    }>;
-    extension?: Array<{
-      url: string;
-      valueString?: string;
-      valueAddress?: { city: string; country: string };
-      valueCode?: string;
-    }>;
-  }
-
-  interface ContactInterface {
-    relationship: Array<{
-      coding: Array<{
-        system: string;
-        code: string;
-      }>;
-    }>;
-    name: {
-      use: "official";
-      text: string;
-    };
-    telecom: Array<{
-      system: "phone" | "email" | "fax" | "pager";
-      value: string;
-      use: "mobile" | "home" | "work" | "temp" | "old";
-    }>;
-  }
-
-  interface FhirPatchPatient {
-    op: "replace" | "test";
-    path: string;
-    value: any;
-  }
-
-  interface PatchPatientInput {
-    name?: string;
-    gender?: "male" | "female" | "other" | "unknown";
-    birthDate?: string;
-
-    nik?: string;
-    ihs?: string;
-
-    maritalStatus?: MarriedStatusIdentifier;
-
-    address?: AddressInterface;
-  }
-
-  interface AddressInterface {
-    line?: string;
+  // ---- FHIR Umum (General Data Types) ----
+  interface FhirAddress {
+    use: "home" | "work" | "temp" | "old" | "billing";
+    type: "postal" | "physical" | "both";
+    text?: string;
+    line?: string[];
     city?: string;
+    district?: string;
+    state?: string;
     postalCode?: string;
     country?: string;
-
-    provinceCode?: string;
-    cityCode?: string;
-    districtCode?: string;
-    villageCode?: string;
-    rt?: string;
-    rw?: string;
+    period?: FhirPeriod;
+    extension?: Array<FhirAddressExtension>;
   }
 
-  interface ExistingPatient {
-    name?: Array<{ use?: string; text?: string }>;
-    gender?: string;
-    birthDate?: string;
-    identifier?: Array<{
-      system: string;
-      use?: string;
-      value: string;
+  interface FhirAddressExtension {
+    url: string;
+    extension: Array<{
+      url: string;
+      valueCode: string;
     }>;
-    address?: unknown[];
   }
 
-  //organization dto
-  type OrganisationTypeCode =
-    (typeof organizationTypes)[keyof typeof organizationTypes]["coding_code"];
+  interface FhirAge {
+    value?: number;
+    comparator?: string;
+    unit?: string;
+    system?: string;
+    code?: string;
+  }
 
-  interface OrganizationInput {
-    active?: boolean;
+  interface FhirAnnotation {
+    authorReference?: FhirReference;
+    authorString?: string;
+    time?: string; // dateTime
+    text: string; // markdown
+  }
 
-    identifier_value: string;
-    partOf?: string;
-
-    type_code: OrganisationTypeCode;
-    name: string;
-
-    phone?: string;
-    email?: string;
+  interface FhirAttachment {
+    contentType?: string;
+    language?: string;
+    data?: string;
     url?: string;
-
-    street?: string;
-    city?: string;
-    postalCode?: string;
-
-    provincecode?: string;
-    citycode?: string;
-    districtcode?: string;
-    villagecode?: string;
+    size?: number;
+    hash?: string;
+    title?: string;
+    creation?: string;
   }
 
-  interface FhirOrganization {
-    resourceType: "Organization";
-    active: boolean;
+  interface FhirCodeableConcept<D> {
+    coding?: FhirCoding<D>[];
+    text?: string;
+  }
 
-    identifier: Array<{
-      use: "official";
-      system: string;
-      value: string;
-    }>;
+  interface FhirCodeableReference {
+    concept?: FhirCodeableConcept;
+    reference?: FhirReference;
+  }
 
-    type: Array<{
-      coding: Array<{
-        system: string;
-        code: string;
-        display: string;
-      }>;
-    }>;
+  interface FhirCoding<D = string> {
+    system?: string; // uri
+    version?: string;
+    code?: D;
+    display?: string;
+    userSelected?: boolean;
+  }
 
-    name: string;
+  interface FhirContactPoint {
+    system?: "phone" | "fax" | "email" | "pager" | "url" | "sms";
+    value?: string;
+    use?: "home" | "work" | "temp" | "old" | "mobile";
+    rank?: number;
+    period?: FhirPeriod;
+  }
+  interface FhirHumanName {
+    use?: string;
+    text?: string;
+    family?: string;
+    given?: string[];
+    prefix?: string[];
+    suffix?: string[];
+    period?: FhirPeriod;
+  }
 
-    telecom?: Array<{
-      system: "phone" | "email" | "url";
-      value: string;
-      use: "work";
-    }>;
+  interface FhirIdentifier {
+    use?: "usual" | "official" | "temp" | "secondary" | "old";
+    type?: FhirCodeableConcept;
+    system?: string;
+    value?: string;
+    period?: FhirPeriod;
+    assigner?: FhirReference;
+  }
 
-    address?: Array<{
-      use: "work";
-      type: "both";
-      line: string[];
-      city: string;
-      postalCode: string;
-      country: "ID";
-      extension: Array<{
-        url: string;
-        extension: Array<{
-          url: string;
-          valueCode: string;
-        }>;
-      }>;
-    }>;
+  interface FhirMoney {
+    value?: number;
+    currency?: string;
+  }
 
-    partOf?: {
-      reference: string;
+  interface FhirPeriod {
+    start?: string; // dateTime
+    end?: string; // dateTime
+  }
+
+  interface FhirQuantity {
+    value?: number;
+    comparator?: "<" | "<=" | ">=" | ">" | string;
+    unit?: string;
+    system?: string;
+    code?: string;
+  }
+
+  interface FhirRange {
+    low?: FhirQuantity;
+    high?: FhirQuantity;
+  }
+
+  interface FhirRatio {
+    numerator?: FhirQuantity;
+    denominator?: FhirQuantity;
+  }
+
+  interface FhirRatioRange {
+    lowNumerator?: FhirQuantity;
+    highNumerator?: FhirQuantity;
+    denominator?: FhirQuantity;
+  }
+
+  interface FhirReference {
+    reference?: string;
+    type?: string; // uri
+    identifier?: FhirIdentifier;
+    display?: string;
+  }
+
+  interface FhirSampledData {
+    origin: FhirQuantity;
+    period: number[];
+    factor?: number;
+    lowerLimit?: number;
+    upperLimit?: number;
+    dimensions: number[];
+    data: string;
+  }
+
+  interface FhirSignature {
+    type?: string[];
+    when?: string; // instant
+    who?: FhirReference[];
+    onBehalfOf?: FhirReference;
+    targetFormat?: string;
+    sigFormat?: string;
+    data?: string;
+  }
+
+  interface FhirTiming {
+    event?: string[]; // dateTime
+    repeat?: {
+      boundsDuration?: FhirDuration;
+      boundsRange?: FhirRange;
+      boundsPeriod?: FhirPeriod;
+      count?: number;
+      countMax?: number;
+      duration?: number;
+      durationMax?: number;
+      durationUnit?: string;
+      frequency?: number;
+      frequencyMax?: number;
+      period?: number;
+      periodMax?: number;
+      periodUnit?: string;
+      dayOfWeek?: string[];
+      timeOfDay?: string[];
+      when?: string[];
+      offset?: number;
     };
+    code?: FhirCodeableConcept;
   }
+
+  // -------------------------------
+  // FHIR Metadata Types (TS Interfaces)
+  // -------------------------------
+
+  interface FhirContactDetail {
+    name?: string;
+    telecom?: FhirContactPoint[];
+  }
+
+  interface FhirContributor {
+    type: string; // code
+    name: string;
+    contact?: FhirContactDetail[];
+  }
+
+  interface FhirDataRequirement<D = string> {
+    type: string; // code
+    profile?: string[]; // canonical
+    subjectCodeableConcept?: FhirCodeableConcept;
+    subjectReference?: FhirReference;
+    mustSupport?: string[];
+    codeFilter?: string[];
+    path?: string;
+    searchParam?: string;
+    valueSet?: string; // canonical
+    code?: FhirCoding<D>[];
+    dateFilter?: string[];
+    valueDateTime?: string; // dateTime
+    valuePeriod?: FhirPeriod;
+    valueDuration?: number;
+    limit?: number; // positiveInt
+    sort?: string[];
+  }
+
+  interface FhirExpression {
+    description?: string;
+    name?: string; // id
+    language: string; // code
+    expression: string;
+    reference?: string; // uri
+  }
+
+  interface FhirParameterDefinition {
+    name?: string; // code
+    use: "in" | "out"; // code
+    min?: number; // integer
+    max?: string;
+    documentation?: string;
+    type: string; // code
+    profile?: string; // canonical
+  }
+
+  interface FhirRelatedArtifact {
+    type:
+      | "documentation"
+      | "justification"
+      | "citation"
+      | "predecessor"
+      | "successor"
+      | "derived-from"
+      | "depends-on"
+      | "composed-of"; // code
+    label?: string;
+    display?: string;
+    citation?: string; // markdown
+    url?: string; // url
+    document?: FhirAttachment;
+    resource?: string; // canonical
+  }
+
+  interface FhirTriggerDefinition {
+    type:
+      | "named-event"
+      | "periodic"
+      | "data-changed"
+      | "data-added"
+      | "data-modified"
+      | "data-removed"
+      | "data-accessed"
+      | "data-access-ended"; // code
+    name?: string;
+    timingTiming?: FhirTiming;
+    timingReference?: FhirReference;
+    timingDate?: string; // date
+    timingDateTime?: string; // dateTime
+    data?: FhirDataRequirement[];
+    condition?: FhirExpression;
+  }
+
+  interface FhirUsageContext<D = string> {
+    code: FhirCoding<D>;
+    valueCodeableConcept?: FhirCodeableConcept;
+    valueQuantity?: FhirQuantity;
+    valueRange?: FhirRange;
+    valueReference?: FhirReference;
+  }
+
+  // -------------------------------
+  // FHIR Special Types (TS Interfaces)
+  // -------------------------------
+
+  // FHIR Special: CodeableReference
+  export interface FhirCodeableReference {
+    concept?: FhirCodeableConcept;
+    reference?: FhirReference;
+  }
+
+  // FHIR Special: Dosage
+  export interface FhirDosage {
+    sequence?: number;
+    text?: string;
+    additionalInstruction?: FhirCodeableConcept[];
+    patientInstruction?: string;
+    timing?: FhirTiming;
+    asNeededBoolean?: boolean;
+    asNeededCodeableConcept?: FhirCodeableConcept;
+    site?: FhirCodeableConcept;
+    route?: FhirCodeableConcept;
+    method?: FhirCodeableConcept;
+    doseAndRate?: {
+      type: FhirCodeableConcept;
+      doseRange?: FhirRange;
+      doseQuantity?: any;
+      rateRatio?: FhirRatio;
+      rateRange?: FhirRange;
+      rateQuantity?: any;
+    }[];
+    maxDosePerPeriod?: FhirRatio;
+    maxDosePerAdministration?: any;
+    maxDosePerLifetime?: any;
+  }
+
+  // FHIR Special: Extension (generic FHIR extension)
+  export interface FhirExtension {
+    url: string;
+    value?: any;
+  }
+
+  // FHIR Special: Meta
+  export interface FhirMeta<D = string, C = string> {
+    versionId?: string;
+    lastUpdated?: string;
+    source?: string;
+    profile?: string[];
+    security?: FhirCoding<D>[];
+    tag?: FhirCoding<C>[];
+  }
+
+  // FHIR Special: Narrative
+  export interface FhirNarrative {
+    status: string;
+    div: string; // XHTML string
+  }
+
+  // FHIR Special: Reference
+  export interface FhirReference {
+    reference?: string;
+    type?: string;
+    identifier?: FhirIdentifier;
+    display?: string;
+  }
+
+  // FHIR Special: XHTML (as a string alias)
+  export type FhirXhtml = string;
 }

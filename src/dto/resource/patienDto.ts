@@ -1,95 +1,121 @@
-import { maritalStatus } from "../../constan";
+import { contactPurpose, maritalStatus } from "../../constan";
+import { DtoCore } from "../core/DtoCore";
 
-export class PatientDto {
+export class PatientDto extends DtoCore {
   private buildIdentifier(
-    createBy: "nik" | "mother_nik",
-    data: { nik: string; kk?: string }
-  ):
-    | Array<{
-        use: "official";
-        system: string;
-        value: string;
-      }>
-    | undefined {
-    const identifierArray: Array<{
-      use: "official";
-      system: string;
-      value: string;
-    }> = [];
+    data: {
+      nik: string;
+      kk?: string;
+      ihs?: string;
+    },
+    newBorn: boolean = false
+  ): Array<FhirIdentifier> {
+    const identifiers: Array<FhirIdentifier> = [];
 
-    if (createBy === "nik") {
-      if (data.nik) {
-        identifierArray.push({
+    if (data.nik) {
+      if (newBorn) {
+        identifiers.push({
+          system: "https://fhir.kemkes.go.id/id/nik-ibu",
           use: "official",
-          system: "https://fhir.kemkes.go.id/id/nik",
           value: data.nik,
         });
-      }
-      if (data.kk) {
-        identifierArray.push({
+      } else {
+        identifiers.push({
+          system: "https://fhir.kemkes.go.id/id/nik",
           use: "official",
-          system: "https://fhir.kemkes.go.id/id/kk",
-          value: data.kk,
-        });
-      }
-    } else if (createBy === "mother_nik") {
-      if (data.nik) {
-        identifierArray.push({
-          use: "official",
-          system: "https://fhir.kemkes.go.id/id/nik-ibu",
           value: data.nik,
         });
       }
     }
 
-    return identifierArray.length > 0 ? identifierArray : undefined;
+    if (data.kk) {
+      identifiers.push({
+        system: "https://fhir.kemkes.go.id/id/kk",
+        use: "official",
+        value: data.kk,
+      });
+    }
+
+    if (data.ihs) {
+      identifiers.push({
+        system: "https://fhir.kemkes.go.id/id/ihs-number",
+        use: "official",
+        value: data.ihs,
+      });
+    }
+
+    return identifiers;
+  }
+
+  private buildName(name: string): Array<FhirHumanName> | undefined {
+    if (!name) return undefined;
+
+    const nameParts = name.split(/\s+/);
+    const family = nameParts.length > 1 ? nameParts.slice(-1)[0] : undefined;
+    const given =
+      nameParts.length > 1 ? nameParts.slice(0, -1) : [nameParts[0]];
+    return [
+      {
+        use: "official",
+        text: name,
+        family: family,
+        given: given.length > 0 ? given : undefined,
+      },
+    ];
+  }
+
+  private buildContact(
+    contact?: Array<{
+      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
+      name: string;
+      phone?: string;
+      email?: string;
+      url?: string;
+    }>
+  ) {
+    if (!contact?.length) return undefined;
+
+    return contact.map((e) => ({
+      purpose: {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/contactentity-type",
+            code: e.purpose_code,
+            display:
+              contactPurpose.find((c) => c.code === e.purpose_code)?.display ||
+              "",
+          },
+        ],
+      },
+      name: {
+        use: "official",
+        text: e.name,
+      },
+      telecom: this.buildTelecom({
+        phone: e.phone ? [e.phone] : undefined,
+        email: e.email ? [e.email] : undefined,
+        url: e.url ? [e.url] : undefined,
+      }),
+    }));
   }
 
   private buildMaritalStatus(
-    data: MariedStatusIdentifier
+    maritalStatusIdentifier: MariedStatusIdentifier
   ): FhirCodeableConcept<MaritalStatusCode> {
-    const maritalData = maritalStatus.find((item) => item.identifier === data)!;
+    const status = maritalStatus.find(
+      (status) => status.identifier === maritalStatusIdentifier
+    );
+
     return {
       coding: [
         {
           system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
-          code: maritalData.code,
-          display: maritalData.display,
+          code: status?.code || "U",
+          display: status?.display || "Unknown",
         },
       ],
-      text: maritalData.display,
+      text: status?.display || "Unknown",
     };
-  }
-
-  private buildContact(
-    contact: Array<{ name: string; type: "phone" | "email"; value: string }>
-  ): Array<ContactInterface> | undefined {
-    if (contact && contact.length > 0) {
-      return contact.map((item) => ({
-        relationship: [
-          {
-            coding: [
-              {
-                system: "http://terminology.hl7.org/CodeSystem/v2-0131",
-                code: "C",
-              },
-            ],
-          },
-        ],
-        name: {
-          use: "official",
-          text: item.name,
-        },
-        telecom: [
-          {
-            system: item.type,
-            value: item.value,
-            use: item.type === "phone" ? "mobile" : "home",
-          },
-        ],
-      }));
-    }
-    return undefined;
   }
 
   private buildExtensions(data: { birthPlace?: { city: string } }): Array<{
@@ -111,67 +137,6 @@ export class PatientDto {
     return ext;
   }
 
-  private buildAddress({
-    address,
-  }: {
-    address?: {
-      line: string;
-      city: string;
-      postalCode?: string;
-      country: string;
-
-      provinceCode: string;
-      cityCode: string;
-      districtCode: string;
-      villageCode: string;
-      rt: string;
-      rw: string;
-    };
-  }): Array<FhirAddress> | undefined {
-    if (!address) return undefined;
-    return [
-      {
-        use: "home" as const,
-        type: "physical",
-        line: [...(address.line ?? [])],
-        city: address.city,
-        postalCode: address.postalCode,
-        country: "ID" as const,
-        extension: [
-          {
-            url: "https://fhir.kemkes.go.id/r4/StructureDefinition/administrativeCode",
-            extension: [
-              {
-                url: "province",
-                valueCode: address.provinceCode,
-              },
-              {
-                url: "city",
-                valueCode: address.cityCode,
-              },
-              {
-                url: "district",
-                valueCode: address.districtCode,
-              },
-              {
-                url: "village",
-                valueCode: address.villageCode,
-              },
-              {
-                url: "rw",
-                valueCode: address.rw,
-              },
-              {
-                url: "rt",
-                valueCode: address.rt,
-              },
-            ],
-          },
-        ],
-      },
-    ];
-  }
-
   /**
    * Format Create Patient Payload
    * @param createBy "nik" | "mother_nik"
@@ -182,41 +147,47 @@ export class PatientDto {
     createBy: "nik" | "mother_nik",
     data: CreatePatientInput
   ): FhirPatient {
-    const nameParts = data.name.split(/\s+/);
-    const family = nameParts.length > 1 ? nameParts.slice(-1)[0] : undefined;
-    const given =
-      nameParts.length > 1 ? nameParts.slice(0, -1) : [nameParts[0]];
     return {
       resourceType: "Patient",
       meta: {
         profile: ["https://fhir.kemkes.go.id/r4/StructureDefinition/Patient"],
       },
-      identifier: this.buildIdentifier(createBy, data),
       active: true,
-      name: [
+
+      identifier: this.buildIdentifier(
         {
-          use: "official",
-          text: data.name,
-          family: family,
-          given: given.length > 0 ? given : undefined,
+          nik: data.nik,
+          kk: data.kk,
         },
-      ],
-      telecom: data.contact
-        ? data.contact.flatMap((contact) => ({
-            system: contact.type,
-            value: contact.value,
-            use: contact.type === "phone" ? "mobile" : "home",
-          }))
-        : undefined,
+        createBy === "mother_nik"
+      ),
+
+      name: this.buildName(data.name),
+      telecom: this.buildTelecom({
+        phone: data.phone ? data.phone : undefined,
+        email: data.email ? data.email : undefined,
+        url: data.url ? data.url : undefined,
+      }),
       gender: data.gender,
       birthDate: data.birthDate,
-      deceasedBoolean: data.deceased ? data.deceased : undefined,
-      address: this.buildAddress({ address: data.address })!,
-      maritalStatus: this.buildMaritalStatus(data.maritalStatus),
+      deceasedBoolean: data.deceased,
+      deceasedDateTime: data.deceasedDateTime,
+
+      address: this.buildAddress(data.address),
+
+      maritalStatus: data.maritalStatus
+        ? this.buildMaritalStatus(data.maritalStatus)
+        : undefined,
+
+      multipleBirthBoolean:
+        data.multipleBirthInteger && data.multipleBirthInteger > 0
+          ? true
+          : false,
       multipleBirthInteger: data.multipleBirthInteger
         ? data.multipleBirthInteger
         : 0,
-      contact: this.buildContact(data.contact ?? []),
+      contact: this.buildContact(data.contact),
+
       communication: [
         {
           language: {
@@ -236,12 +207,12 @@ export class PatientDto {
     };
   }
 
-  /**
-   * Format Patch Patient Payload
-   * @param data PatchPatientInput
-   * @param existingData ExistingPatient
-   * @returns FhirPatchPatient[]
-   */
+  // /**
+  //  * Format Patch Patient Payload
+  //  * @param data PatchPatientInput
+  //  * @param existingData ExistingPatient
+  //  * @returns FhirPatchPatient[]
+  //  */
   fromatPatchPayload(
     data: PatchPatientInput,
     existingData: ExistingPatient
@@ -254,41 +225,41 @@ export class PatientDto {
 
     const patchOps: FhirPatchPatient[] = [];
 
-    // ✅ Helper test & replace
-    const testAndReplace = (
-      path: string,
-      oldValue: unknown,
-      newValue: unknown
-    ) => {
-      if (
-        oldValue === undefined ||
-        oldValue === null ||
-        newValue === undefined ||
-        newValue === null
-      ) {
-        throw new Error(
-          `⚠️ Field '${path}' wajib ada di data lama dan baru untuk PATCH.`
-        );
-      }
-      patchOps.push({ op: "test", path, value: oldValue });
-      patchOps.push({ op: "replace", path, value: newValue });
-    };
-
-    // 🔹 Name
     if (data.name) {
-      testAndReplace("/name", existingData.name, [
-        { use: "official", text: data.name },
-      ]);
+      // if (!existingData.name) {
+      //   throw new Error(
+      //     "⚠️ Field 'name' lama tidak ditemukan. PATCH dibatalkan."
+      //   );
+      // }
+
+      const newName = this.buildName(data.name);
+
+      patchOps.push({
+        op: "test",
+        path: "/name",
+        value: existingData.name,
+      });
+
+      patchOps.push({
+        op: "replace",
+        path: "/name",
+        value: newName,
+      });
     }
 
     // 🔹 Gender
     if (data.gender) {
-      testAndReplace("/gender", existingData.gender, data.gender);
-    }
+      patchOps.push({
+        op: "test",
+        path: "/gender",
+        value: existingData.gender,
+      });
 
-    // 🔹 BirthDate
-    if (data.birthDate) {
-      testAndReplace("/birthDate", existingData.birthDate, data.birthDate);
+      patchOps.push({
+        op: "replace",
+        path: "/gender",
+        value: data.gender,
+      });
     }
 
     // 🔹 Identifier
@@ -349,55 +320,17 @@ export class PatientDto {
         );
       }
 
-      const newAddress = {
-        use: "home",
-        line: data.address.line ? [data.address.line] : [],
-        city: data.address.city,
-        postalCode: data.address.postalCode,
-        country: "ID",
-        extension: [
-          {
-            url: "https://fhir.kemkes.go.id/r4/StructureDefinition/administrativeCode",
-            extension: [
-              data.address.provinceCode && {
-                url: "province",
-                valueCode: data.address.provinceCode,
-              },
-              data.address.cityCode && {
-                url: "city",
-                valueCode: data.address.cityCode,
-              },
-              data.address.districtCode && {
-                url: "district",
-                valueCode: data.address.districtCode,
-              },
-              data.address.villageCode && {
-                url: "village",
-                valueCode: data.address.villageCode,
-              },
-              data.address.rt && {
-                url: "rt",
-                valueCode: data.address.rt,
-              },
-              data.address.rw && {
-                url: "rw",
-                valueCode: data.address.rw,
-              },
-            ].filter(Boolean),
-          },
-        ],
-      };
+      const newAddress = this.buildAddress(data.address);
 
       patchOps.push({
         op: "test",
         path: "/address",
         value: existingData.address,
       });
-
       patchOps.push({
         op: "replace",
         path: "/address",
-        value: [newAddress],
+        value: newAddress,
       });
     }
 

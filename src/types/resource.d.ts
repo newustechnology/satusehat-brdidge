@@ -29,16 +29,18 @@ declare global {
     };
 
     deceased?: boolean;
+    deceasedDateTime?: string; // dateTime
 
-    telecom?: Array<{
-      type: "phone" | "email";
-      value: string;
-    }>;
+    phone?: string[];
+    email?: string[];
+    url?: string[];
 
     contact?: Array<{
+      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
       name: string;
-      type: "phone" | "email";
-      value: string;
+      phone?: string;
+      email?: string;
+      url?: string;
     }>;
 
     address: {
@@ -55,9 +57,53 @@ declare global {
       rw: string;
     };
 
-    maritalStatus: MarriedStatusIdentifier;
+    maritalStatus: MariedStatusIdentifier;
 
     multipleBirthInteger?: number;
+  }
+
+  interface PatchPatientInput {
+    name?: string;
+    gender?: "male" | "female" | "other" | "unknown";
+    birthDate?: string;
+
+    nik?: string;
+    ihs?: string;
+
+    maritalStatus?: MarriedStatusIdentifier;
+
+    address?: {
+      line: string;
+      city: string;
+      postalCode?: string;
+      country: string;
+
+      provinceCode: string;
+      cityCode: string;
+      districtCode: string;
+      villageCode: string;
+      rt: string;
+      rw: string;
+    };
+  }
+
+  interface ExistingPatient {
+    name?: Array<FhirHumanName>;
+    id?: string;
+    gender?: string;
+    birthDate?: string;
+    identifier?: Array<FhirIdentifier>;
+    maritalStatus?: FhirCodeableConcept<MaritalStatusCode>;
+    multipleBirthBoolean?: boolean;
+    multipleBirthInteger?: number;
+    telecom?: Array<FhirContactPoint>;
+    address?: Array<FhirAddress>;
+  }
+
+  interface FhirPatchPatient {
+    op: "replace" | "test";
+    path: string;
+    value: any;
   }
 
   interface ContactInterface {
@@ -73,37 +119,6 @@ declare global {
   interface CommunicationInterface {
     language?: FhirCodeableConcept<string>;
     preferred: boolean;
-  }
-
-  interface FhirPatchPatient {
-    op: "replace" | "test";
-    path: string;
-    value: any;
-  }
-
-  interface PatchPatientInput {
-    name?: string;
-    gender?: "male" | "female" | "other" | "unknown";
-    birthDate?: string;
-
-    nik?: string;
-    ihs?: string;
-
-    maritalStatus?: MarriedStatusIdentifier;
-
-    address?: AddressInterface;
-  }
-
-  interface ExistingPatient {
-    name?: Array<{ use?: string; text?: string }>;
-    gender?: string;
-    birthDate?: string;
-    identifier?: Array<{
-      system: string;
-      use?: string;
-      value: string;
-    }>;
-    address?: unknown[];
   }
 
   interface FhirPatient {
@@ -147,10 +162,7 @@ declare global {
 
   interface OrganizationInput {
     active?: boolean;
-
     identifier_value: string;
-    partOf?: string;
-
     type_code: OrganisationTypeCode;
     name: string;
 
@@ -166,31 +178,19 @@ declare global {
     citycode?: string;
     districtcode?: string;
     villagecode?: string;
+
+    partOf?: string;
+    contact?: Array<{
+      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
+      name: string;
+      phone?: string;
+      email?: string;
+      url?: string;
+    }>;
   }
 
-  interface OrganizationUpdateInput {
+  interface OrganizationUpdateInput extends OrganizationInput {
     id: string;
-
-    active?: boolean;
-
-    identifier_value: string;
-    partOf?: string;
-
-    type_code: OrganisationTypeCode;
-    name: string;
-
-    phone?: string;
-    email?: string;
-    url?: string;
-
-    street?: string;
-    city?: string;
-    postalCode?: string;
-
-    provincecode?: string;
-    citycode?: string;
-    districtcode?: string;
-    villagecode?: string;
   }
 
   // output fhir organization

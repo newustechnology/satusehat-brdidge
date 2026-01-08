@@ -1,102 +1,53 @@
-import { organizationTypes } from "../../constan";
+import { contactPurpose, organizationTypes } from "../../constan";
+import { DtoCore } from "../core/DtoCore";
 
-export class OrganizationDto {
-  static formatOrganizationData(data: OrganizationInput): FhirOrganization {
-    return {
-      resourceType: "Organization",
-      active: data.active ?? true,
+export class OrganizationDto extends DtoCore {
+  /* =========================
+   * helper function
+   * ========================= */
 
-      identifier: [
-        {
-          use: "official",
-          system: `http://sys-ids.kemkes.go.id/organization/${data.partOf}`,
-          value: data.identifier_value,
-        },
-      ],
+  protected buildContact(
+    contact?: Array<{
+      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
+      name: string;
+      phone?: string;
+      email?: string;
+      url?: string;
+    }>
+  ) {
+    if (!contact?.length) return undefined;
 
-      type: [
-        {
-          coding: [
-            {
-              system: "http://terminology.hl7.org/CodeSystem/organization-type",
-              code: data.type_code,
-              display: organizationTypes[data.type_code].coding_display,
-            },
-          ],
-        },
-      ],
-
-      name: data.name,
-
-      telecom: [
-        ...(data.phone
-          ? [
-              {
-                system: "phone" as const,
-                value: data.phone,
-                use: "work" as const,
-              },
-            ]
-          : []),
-        ...(data.email
-          ? [
-              {
-                system: "email" as const,
-                value: data.email,
-                use: "work" as const,
-              },
-            ]
-          : []),
-        ...(data.url
-          ? [{ system: "url" as const, value: data.url, use: "work" as const }]
-          : []),
-      ],
-
-      address:
-        data.street && data.city && data.postalCode
-          ? [
-              {
-                use: "work",
-                type: "both",
-                line: [data.street],
-                city: data.city,
-                postalCode: data.postalCode,
-                country: "ID",
-                extension: [
-                  {
-                    url: "https://fhir.kemkes.go.id/r4/StructureDefinition/administrativeCode",
-                    extension: [
-                      ...(data.provincecode
-                        ? [{ url: "province", valueCode: data.provincecode }]
-                        : []),
-                      ...(data.citycode
-                        ? [{ url: "city", valueCode: data.citycode }]
-                        : []),
-                      ...(data.districtcode
-                        ? [{ url: "district", valueCode: data.districtcode }]
-                        : []),
-                      ...(data.villagecode
-                        ? [{ url: "village", valueCode: data.villagecode }]
-                        : []),
-                    ],
-                  },
-                ],
-              },
-            ]
-          : [],
-
-      partOf: data.partOf
-        ? { reference: `Organization/${data.partOf}` }
-        : undefined,
-    };
+    return contact.map((e) => ({
+      purpose: {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/contactentity-type",
+            code: e.purpose_code,
+            display:
+              contactPurpose.find((c) => c.code === e.purpose_code)?.display ||
+              "",
+          },
+        ],
+      },
+      name: {
+        use: "official",
+        text: e.name,
+      },
+      telecom: this.buildTelecom({
+        phone: e.phone ? [e.phone] : undefined,
+        email: e.email ? [e.email] : undefined,
+        url: e.url ? [e.url] : undefined,
+      }),
+    }));
   }
 
-  static formatOrganizationDataUpdate(
-    data: OrganizationUpdateInput
+  private buildOrganization(
+    data: OrganizationInput | OrganizationUpdateInput,
+    withId = false
   ): FhirOrganization {
     return {
       resourceType: "Organization",
-      id: data.id,
+      ...(withId && "id" in data ? { id: data.id } : {}),
       active: data.active ?? true,
 
       identifier: [
@@ -120,67 +71,29 @@ export class OrganizationDto {
       ],
 
       name: data.name,
-
-      telecom: [
-        ...(data.phone
-          ? [
-              {
-                system: "phone" as const,
-                value: data.phone,
-                use: "work" as const,
-              },
-            ]
-          : []),
-        ...(data.email
-          ? [
-              {
-                system: "email" as const,
-                value: data.email,
-                use: "work" as const,
-              },
-            ]
-          : []),
-        ...(data.url
-          ? [{ system: "url" as const, value: data.url, use: "work" as const }]
-          : []),
-      ],
-
-      address:
-        data.street && data.city && data.postalCode
-          ? [
-              {
-                use: "work",
-                type: "both",
-                line: [data.street],
-                city: data.city,
-                postalCode: data.postalCode,
-                country: "ID",
-                extension: [
-                  {
-                    url: "https://fhir.kemkes.go.id/r4/StructureDefinition/administrativeCode",
-                    extension: [
-                      ...(data.provincecode
-                        ? [{ url: "province", valueCode: data.provincecode }]
-                        : []),
-                      ...(data.citycode
-                        ? [{ url: "city", valueCode: data.citycode }]
-                        : []),
-                      ...(data.districtcode
-                        ? [{ url: "district", valueCode: data.districtcode }]
-                        : []),
-                      ...(data.villagecode
-                        ? [{ url: "village", valueCode: data.villagecode }]
-                        : []),
-                    ],
-                  },
-                ],
-              },
-            ]
-          : [],
-
+      telecom: this.buildTelecom({
+        phone: data.phone ? [data.phone] : undefined,
+        email: data.email ? [data.email] : undefined,
+        url: data.url ? [data.url] : undefined,
+      }),
+      address: this.buildAddress(data),
       partOf: data.partOf
         ? { reference: `Organization/${data.partOf}` }
         : undefined,
+      contact: this.buildContact(data.contact),
     };
+  }
+
+  /* =========================
+   * PUBLIC API
+   * ========================= */
+  formatOrganizationData(data: OrganizationInput): FhirOrganization {
+    return this.buildOrganization(data);
+  }
+
+  formatOrganizationDataUpdate(
+    data: OrganizationUpdateInput
+  ): FhirOrganization {
+    return this.buildOrganization(data, true);
   }
 }

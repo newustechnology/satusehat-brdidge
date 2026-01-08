@@ -200,3 +200,129 @@ export const patientContactRelationship = [
     definition: "Unknown",
   },
 ] as const;
+
+export const operationalStatus = [
+  {
+    code: "C",
+    display: "Closed",
+    definition: "Closed",
+  },
+  {
+    code: "H",
+    display: "Housekeeping",
+    definition: "Housekeeping",
+  },
+  {
+    code: "O",
+    display: "Occupied",
+    definition: "Occupied",
+  },
+  {
+    code: "U",
+    display: "Unoccupied",
+    definition: "Unoccupied",
+  },
+  {
+    code: "K",
+    display: "Contaminated",
+    definition: "Contaminated",
+  },
+  {
+    code: "I",
+    display: "Isolated",
+    definition: "Isolated",
+  },
+] as const;
+
+export const physicalType = [
+  {
+    code: "si",
+    display: "Site",
+    keterangan:
+      "Kumpulan bangunan atau lokasi lain seperti kompleks atau kampus",
+  },
+  {
+    code: "bu",
+    display: "Building",
+    keterangan: "Setiap bangunan atau struktur",
+  },
+  {
+    code: "lvl",
+    display: "Level",
+    keterangan: "Lantai di Gedung/Struktur",
+  },
+  {
+    code: "ro",
+    display: "Room",
+    keterangan: "Sebuah ruangan yang dialokasikan sebagai ruangan",
+  },
+  {
+    code: "wi",
+    display: "Wing",
+    keterangan:
+      "Sayap di dalam Gedung, sering berisi lantai, kamar, dan koridor",
+  },
+  {
+    code: "wa",
+    display: "Ward",
+    keterangan:
+      "Bangsal adalah bagian dari fasilitas medis yang mungkin berisi kamar dan jenis lokasi lainnya",
+  },
+  {
+    code: "co",
+    display: "Corridor",
+    keterangan:
+      "Setiap koridor di dalam Gedung, yang dapat menghubungkan kamar-kamar",
+  },
+  {
+    code: "bd",
+    display: "Bed",
+    keterangan: "Tempat tidur yang dapat ditempati",
+  },
+  {
+    code: "ve",
+    display: "Vehicle",
+    keterangan: "Alat transportasi",
+  },
+  {
+    code: "ho",
+    display: "House",
+    keterangan: "Rumah",
+  },
+  {
+    code: "ca",
+    display: "Cabinet",
+    keterangan:
+      "Wadah yang dapat menyimpan barang, peralatan, obat-obatan atau barang lainnya",
+  },
+  {
+    code: "rd",
+    display: "Road",
+    keterangan: "Jalan",
+  },
+  {
+    code: "area",
+    display: "Area",
+    keterangan: "Area (contoh: zona risiko banjir, wilayah kodepos)",
+  },
+  {
+    code: "jdn",
+    display: "Jurisdiction",
+    keterangan: "Negara, Provinsi",
+  },
+  {
+    code: "vir",
+    display: "Virtual",
+    keterangan: "Lokasi virtual",
+  },
+] as const;
+
+export const daysOfWeek = [
+  { code: "mon", display: "Senin" },
+  { code: "tue", display: "Selasa" },
+  { code: "wed", display: "Rabu" },
+  { code: "thu", display: "Kamis" },
+  { code: "fri", display: "Jumat" },
+  { code: "sat", display: "Sabtu" },
+  { code: "sun", display: "Minggu" },
+] as const;

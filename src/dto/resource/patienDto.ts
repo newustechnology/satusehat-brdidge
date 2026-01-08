@@ -1,7 +1,13 @@
-import { contactPurpose, maritalStatus } from "../../constan";
+import { maritalStatus } from "../../constan";
 import { DtoCore } from "../core/DtoCore";
 
 export class PatientDto extends DtoCore {
+  /**
+   *  Build Identifier
+   * @param data
+   * @param newBorn // default false
+   * @returns Array<FhirIdentifier>
+   */
   private buildIdentifier(
     data: {
       nik: string;
@@ -47,6 +53,11 @@ export class PatientDto extends DtoCore {
     return identifiers;
   }
 
+  /**
+   * Build Name
+   * @param name
+   * @returns
+   */
   private buildName(name: string): Array<FhirHumanName> | undefined {
     if (!name) return undefined;
 
@@ -64,41 +75,11 @@ export class PatientDto extends DtoCore {
     ];
   }
 
-  private buildContact(
-    contact?: Array<{
-      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
-      name: string;
-      phone?: string;
-      email?: string;
-      url?: string;
-    }>
-  ) {
-    if (!contact?.length) return undefined;
-
-    return contact.map((e) => ({
-      purpose: {
-        coding: [
-          {
-            system: "http://terminology.hl7.org/CodeSystem/contactentity-type",
-            code: e.purpose_code,
-            display:
-              contactPurpose.find((c) => c.code === e.purpose_code)?.display ||
-              "",
-          },
-        ],
-      },
-      name: {
-        use: "official",
-        text: e.name,
-      },
-      telecom: this.buildTelecom({
-        phone: e.phone ? [e.phone] : undefined,
-        email: e.email ? [e.email] : undefined,
-        url: e.url ? [e.url] : undefined,
-      }),
-    }));
-  }
-
+  /**
+   * Build Marital Status
+   * @param maritalStatusIdentifier
+   * @returns
+   */
   private buildMaritalStatus(
     maritalStatusIdentifier: MariedStatusIdentifier
   ): FhirCodeableConcept<MaritalStatusCode> {
@@ -118,6 +99,11 @@ export class PatientDto extends DtoCore {
     };
   }
 
+  /**
+   *  Build Extensions
+   * @param data
+   * @returns
+   */
   private buildExtensions(data: { birthPlace?: { city: string } }): Array<{
     url: string;
     valueAddress?: { city: string; country: string };
@@ -207,12 +193,12 @@ export class PatientDto extends DtoCore {
     };
   }
 
-  // /**
-  //  * Format Patch Patient Payload
-  //  * @param data PatchPatientInput
-  //  * @param existingData ExistingPatient
-  //  * @returns FhirPatchPatient[]
-  //  */
+  /**
+   * Format Patch Patient Payload
+   * @param data
+   * @param existingData
+   * @returns
+   */
   fromatPatchPayload(
     data: PatchPatientInput,
     existingData: ExistingPatient
@@ -226,12 +212,6 @@ export class PatientDto extends DtoCore {
     const patchOps: FhirPatchPatient[] = [];
 
     if (data.name) {
-      // if (!existingData.name) {
-      //   throw new Error(
-      //     "⚠️ Field 'name' lama tidak ditemukan. PATCH dibatalkan."
-      //   );
-      // }
-
       const newName = this.buildName(data.name);
 
       patchOps.push({

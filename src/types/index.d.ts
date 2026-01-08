@@ -1,6 +1,40 @@
 export {};
 
 declare global {
+  // global //
+  type TelecomUse = "work" | "home" | "temp" | "old" | "mobile";
+
+  interface TelecomItem {
+    value: string;
+    use: TelecomUse;
+  }
+
+  interface TelecomInputArray {
+    phone?: TelecomItem[];
+    email?: TelecomItem[];
+    url?: TelecomItem[];
+  }
+
+  interface TelecomInputSimple {
+    phone?: string[];
+    email?: string[];
+    url?: string[];
+  }
+
+  interface AddressInput {
+    line: string;
+    city: string;
+    postalCode?: string;
+    country: string;
+
+    provinceCode: string;
+    cityCode: string;
+    districtCode: string;
+    villageCode: string;
+    rt: string;
+    rw: string;
+  }
+
   // ---- FHIR Umum (General Data Types) ----
   interface FhirAddress {
     use: "home" | "work" | "temp" | "old" | "billing";

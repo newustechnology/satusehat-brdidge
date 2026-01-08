@@ -1,15 +1,17 @@
 import {
   contactPurpose,
+  daysOfWeek,
   maritalStatus,
+  operationalStatus,
   organizationTypes,
   patientContactRelationship,
+  physicalType,
 } from "../constan";
 
 export {};
 
 declare global {
   // requires
-
   //patient dto
   type MariedStatusIdentifier = (typeof maritalStatus)[number]["identifier"];
   type MaritalStatusCode = (typeof maritalStatus)[number]["code"];
@@ -43,19 +45,7 @@ declare global {
       url?: string;
     }>;
 
-    address: {
-      line: string;
-      city: string;
-      postalCode?: string;
-      country: string;
-
-      provinceCode: string;
-      cityCode: string;
-      districtCode: string;
-      villageCode: string;
-      rt: string;
-      rw: string;
-    };
+    address: AddressInput;
 
     maritalStatus: MariedStatusIdentifier;
 
@@ -72,19 +62,7 @@ declare global {
 
     maritalStatus?: MarriedStatusIdentifier;
 
-    address?: {
-      line: string;
-      city: string;
-      postalCode?: string;
-      country: string;
-
-      provinceCode: string;
-      cityCode: string;
-      districtCode: string;
-      villageCode: string;
-      rt: string;
-      rw: string;
-    };
+    address?: AddressInput;
   }
 
   interface ExistingPatient {
@@ -216,5 +194,68 @@ declare global {
       address?: FhirAddress;
       endpoint?: Array<FhirReference>;
     }>;
+  }
+
+  // location dto
+
+  type FhirOperationalStatusCode = (typeof operationalStatus)[number]["code"];
+  type FhirOperationalStatusDisplay =
+    (typeof operationalStatus)[number]["display"];
+  type FhirPhysicalTypeCode = (typeof physicalType)[number]["code"];
+  type FhirDayOfWeekCode = (typeof daysOfWeek)[number]["code"];
+
+  interface LocationDtoInput {
+    organizationIhsNumber: string;
+    id?: string;
+    locationCode: string;
+    status: "active" | "suspended" | "inactive";
+    name: string;
+    alias?: Array<string>;
+    description?: string;
+    mode: "instance" | "kind";
+    telecom?: Array<TelecomInputArray>;
+    address?: AddressInput;
+    physicalType: FhirPhysicalTypeCode;
+    position?: {
+      longitude?: number;
+      latitude?: number;
+      altitude?: number;
+    };
+  }
+
+  interface FhirLocation {
+    resourceType?: "Location";
+    id?: string;
+    identifier?: Array<FhirIdentifier>;
+    status?: "active" | "suspended" | "inactive";
+    operationalStatus?: FhirCoding<FhirOperationalStatusCode>;
+    name?: string;
+    alias?: Array<string>;
+    description?: string;
+    mode?: "instance" | "kind";
+    type?: Array<FhirCodeableConcept<string>>;
+    telecom?: Array<FhirContactPoint>;
+    address?: FhirAddress;
+    physicalType?: {
+      coding: FhirCoding<FhirPhysicalTypeCode>[];
+    };
+    position?: {
+      longitude?: number;
+      latitude?: number;
+      altitude?: number;
+    };
+    managingOrganization?: FhirReference;
+    partOf?: FhirReference;
+    hoursOfOperation?: Array<{
+      daysOfWeek?: Array<FhirDayOfWeekCode>;
+      allDay?: boolean;
+      openingTime?: string; // time
+      closingTime?: string; // time
+    }>;
+    availabilityExceptions?: string;
+    endpoint?: Array<FhirReference>;
+    extension?: {
+      serviceClass: FhirCodeableConcept<string>;
+    };
   }
 }

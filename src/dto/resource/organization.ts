@@ -6,41 +6,6 @@ export class OrganizationDto extends DtoCore {
    * helper function
    * ========================= */
 
-  protected buildContact(
-    contact?: Array<{
-      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
-      name: string;
-      phone?: string;
-      email?: string;
-      url?: string;
-    }>
-  ) {
-    if (!contact?.length) return undefined;
-
-    return contact.map((e) => ({
-      purpose: {
-        coding: [
-          {
-            system: "http://terminology.hl7.org/CodeSystem/contactentity-type",
-            code: e.purpose_code,
-            display:
-              contactPurpose.find((c) => c.code === e.purpose_code)?.display ||
-              "",
-          },
-        ],
-      },
-      name: {
-        use: "official",
-        text: e.name,
-      },
-      telecom: this.buildTelecom({
-        phone: e.phone ? [e.phone] : undefined,
-        email: e.email ? [e.email] : undefined,
-        url: e.url ? [e.url] : undefined,
-      }),
-    }));
-  }
-
   private buildOrganization(
     data: OrganizationInput | OrganizationUpdateInput,
     withId = false

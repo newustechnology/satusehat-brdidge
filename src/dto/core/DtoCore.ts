@@ -1,33 +1,54 @@
 import { contactPurpose } from "../../constan";
 
 export class DtoCore {
-  protected buildTelecom(data: {
-    phone?: string[];
-    email?: string[];
-    url?: string[];
-  }): Array<FhirContactPoint> {
+  // private pushTelecomItems
+  private pushTelecomItems = (
+    result: FhirContactPoint[],
+    system: FhirContactPoint["system"],
+    items?: TelecomItem[]
+  ) => {
+    if (!items) return;
+    items.forEach(({ value, use }) => {
+      result.push({ system, value, use });
+    });
+  };
+  /**
+   *  Build Telecom
+   * @param data
+   * @returns
+   */
+  protected buildTelecom(
+    data: TelecomInputSimple | TelecomInputArray[]
+  ): FhirContactPoint[] {
+    const result: FhirContactPoint[] = [];
+
+    // ✅ Mode advanced (array of structured input)
+    if (Array.isArray(data)) {
+      data.forEach((item) => {
+        this.pushTelecomItems(result, "phone", item.phone);
+        this.pushTelecomItems(result, "email", item.email);
+        this.pushTelecomItems(result, "url", item.url);
+      });
+      return result;
+    }
+
+    // ✅ Mode simple (string array → default work)
     return [
-      ...(data.phone
-        ? data.phone.map((phone) => ({
-            system: "phone" as const,
-            value: phone,
-            use: "work" as const,
-          }))
-        : []),
-      ...(data.email
-        ? data.email.map((email) => ({
-            system: "email" as const,
-            value: email,
-            use: "work" as const,
-          }))
-        : []),
-      ...(data.url
-        ? data.url.map((url) => ({
-            system: "url" as const,
-            value: url,
-            use: "work" as const,
-          }))
-        : []),
+      ...(data.phone ?? []).map((value) => ({
+        system: "phone" as const,
+        value,
+        use: "work" as const,
+      })),
+      ...(data.email ?? []).map((value) => ({
+        system: "email" as const,
+        value,
+        use: "work" as const,
+      })),
+      ...(data.url ?? []).map((value) => ({
+        system: "url" as const,
+        value,
+        use: "work" as const,
+      })),
     ];
   }
 
@@ -76,5 +97,40 @@ export class DtoCore {
         ],
       },
     ];
+  }
+
+  protected buildContact(
+    contact?: Array<{
+      purpose_code: ContactPurposeCode; // http://terminology.hl7.org/CodeSystem/contactentity-type
+      name: string;
+      phone?: string;
+      email?: string;
+      url?: string;
+    }>
+  ) {
+    if (!contact?.length) return undefined;
+
+    return contact.map((e) => ({
+      purpose: {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/contactentity-type",
+            code: e.purpose_code,
+            display:
+              contactPurpose.find((c) => c.code === e.purpose_code)?.display ||
+              "",
+          },
+        ],
+      },
+      name: {
+        use: "official",
+        text: e.name,
+      },
+      telecom: this.buildTelecom({
+        phone: e.phone ? [e.phone] : undefined,
+        email: e.email ? [e.email] : undefined,
+        url: e.url ? [e.url] : undefined,
+      }),
+    }));
   }
 }

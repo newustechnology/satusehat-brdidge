@@ -1,162 +1,187 @@
 import Redis from "ioredis";
+import axios, { Axios, AxiosInstance, AxiosResponse } from "axios";
 import { BaseConfig, baseUrls } from "../../config/BaseConfig";
 import {
   SatuSehatErrorAuthError,
   SatuSehatErrorCacheError,
-} from "../../lib/ErrorModule";
+  SatuSehatErrorFactory,
+  SatuSehatErrorUrlNotFound,
+} from "../../types/globalErrorModule";
+import { OAuthTokenResponse } from "../../types/auth";
+import { endpoints } from "../../config/enpoint";
 
 export class BaseService {
-  private url: { auth: string; baseUrl: string };
-  private redisClient: Redis | null = null;
-  private defaultRedisKeyPrefix = "satusehat_bridge";
+  private readonly url: { auth: string; baseUrl: string };
+  private readonly redis: Redis;
+  private readonly redisPrefix: string;
+  private readonly config: BaseConfig;
 
   constructor(config: BaseConfig, redisClient: Redis) {
+    this.config = config;
+    this.redis = redisClient;
+
     this.url = {
       auth: baseUrls[config.module].auth,
       baseUrl: baseUrls[config.module].baseUrl,
     };
 
-    this.redisClient = redisClient;
+    this.redisPrefix = `satusehat_bridge_${config.client_id}`;
 
-    this.redisClient.on("connect", () => {
-      console.info("[BRIDGE FKTP BPJS] => ✅ Redis connected");
-    });
+    this.redis.on("connect", () =>
+      console.info("[SATUSEHAT] ✅ Redis connected")
+    );
 
-    this.redisClient.on("error", (err: Error) => {
-      console.error("[BRIDGE FKTP BPJS] => ❌ Redis error:", err);
-    });
-
-    this.defaultRedisKeyPrefix =
-      this.defaultRedisKeyPrefix + "_" + config.client_id + ":";
+    this.redis.on("error", (err) =>
+      console.error("[SATUSEHAT] ❌ Redis error:", err)
+    );
   }
 
-  /**
-   * Menyimpan data ke Redis dengan TTL (time-to-live)
-   * @param key - Kunci data
-   * @param value - Data yang akan disimpan
-   * @param expInSecond - Waktu kadaluarsa dalam detik (default: 3600)
-   */
+  /* ============================================================
+     REDIS HELPERS
+     ============================================================ */
+
+  private buildKey(key: string): string {
+    return `${this.redisPrefix}:${key}`;
+  }
+
   private async set<T>(
     key: string,
     value: T,
-    expInSecond: number = 3600
+    ttlSeconds: number = 3600
   ): Promise<void> {
-    if (typeof expInSecond !== "number") {
-      expInSecond = 3600;
-    }
     try {
       const data =
         typeof value === "object" ? JSON.stringify(value) : String(value);
-      await this.redisClient!.set(
-        this.defaultRedisKeyPrefix + ":" + key,
-        data,
-        "EX",
-        expInSecond
-      );
+
+      await this.redis.set(this.buildKey(key), data, "EX", ttlSeconds);
     } catch (error) {
-      console.error("❌ Redis set error:", error);
       throw new SatuSehatErrorCacheError(
-        "Gagal menyimpan data ke cache",
+        "Gagal menyimpan data ke Redis",
         error
       );
     }
   }
 
-  /**
-   * Mengambil data dari Redis
-   * @param key - Kunci data
-   * @returns Data dari Redis atau null jika tidak ditemukan
-   */
   private async get(key: string): Promise<string | null> {
     try {
-      const data = await this.redisClient!.get(
-        this.defaultRedisKeyPrefix + ":" + key
-      );
-      if (data) {
-        console.info(`🔍 Redis GET: ${this.defaultRedisKeyPrefix + key}`);
-        return data;
-      }
-      return null;
+      return await this.redis.get(this.buildKey(key));
     } catch (error) {
-      console.error("❌ Redis get error:", error);
+      console.error("[REDIS GET ERROR]", error);
       return null;
     }
   }
 
-  /**
-   * Menghapus data dari Redis
-   * @param key - Kunci data
-   */
   private async del(key: string): Promise<void> {
     try {
-      await this.redisClient!.del(this.defaultRedisKeyPrefix + ":" + key);
-      console.info(`🗑️ Redis DEL: ${this.defaultRedisKeyPrefix + key}`);
+      await this.redis.del(this.buildKey(key));
     } catch (error) {
-      console.error("❌ Redis del error:", error);
-      throw new SatuSehatErrorCacheError("Gagal menghapus data cache", error);
+      throw new SatuSehatErrorCacheError("Gagal menghapus data Redis", error);
     }
   }
 
-  /**
-   *
-   * @param pattern - Pola kunci untuk menghapus (misal: 'user_*' untuk menghapus semua kunci yang diawali 'user_')
-   * Menghapus beberapa kunci berdasarkan pola (pattern)
-   */
-  private async deleteKeysByPattern(pattern: string) {
-    try {
-      let cursor = "0";
-      pattern = this.defaultRedisKeyPrefix + ":" + pattern;
+  /* ============================================================
+     AUTH TOKEN
+     ============================================================ */
 
-      do {
-        const [nextCursor, foundKeys] = await this.redisClient!.scan(
-          cursor,
-          "MATCH",
-          pattern,
-          "COUNT",
-          100
-        );
-        cursor = nextCursor;
-        if (foundKeys.length > 0) {
-          await this.redisClient!.del(...foundKeys);
+  protected async generateAuthToken(): Promise<string> {
+    const cacheKey = "auth_token";
+
+    const cachedToken = await this.get(cacheKey);
+    if (cachedToken) return cachedToken;
+
+    try {
+      const { data } = await axios.post<OAuthTokenResponse>(
+        `${this.url.auth}/accesstoken`,
+        new URLSearchParams({
+          grant_type: "client_credentials",
+          client_id: this.config.client_id,
+          client_secret: this.config.client_secret,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
-      } while (cursor !== "0");
-    } catch (error) {
-      console.error("❌ Redis delete by pattern error:", error);
-      throw new SatuSehatErrorCacheError(
-        "Gagal menghapus data cache berdasarkan pattern",
-        error
       );
-    }
-  }
 
-  /**
-   * Membersihkan seluruh cache Redis
-   */
-  private async flushAll(): Promise<void> {
-    try {
-      await this.redisClient!.flushall();
-      console.info("🧹 Redis cache cleared!");
-    } catch (error) {
-      console.error("❌ Redis flush error:", error);
-      throw new SatuSehatErrorCacheError("Gagal membersihkan cache", error);
-    }
-  }
-
-  protected async GenerateTokenAuthUrl(): Promise<{ token: string }> {
-    const key = this.defaultRedisKeyPrefix + "auth_token";
-
-    try {
-      const toketFormChace = await this.get(key);
-      if (toketFormChace) {
-        return { token: toketFormChace };
+      if (!data?.access_token) {
+        throw new SatuSehatErrorAuthError("Token tidak valid");
       }
 
-      return { token: `${this.url.auth}/oauth2/token` };
+      const ttl = Math.max(Number(data.expires_in) - 60, 60);
+
+      await this.set(cacheKey, data.access_token, ttl);
+
+      return data.access_token;
     } catch (error) {
-      throw new SatuSehatErrorAuthError(
-        "Gagal menghasilkan URL otentikasi token",
-        error
-      );
+      throw new SatuSehatErrorFactory(error);
+    }
+  }
+
+  /* ============================================================
+     AXIOS CLIENT
+     ============================================================ */
+
+  private async createClient(): Promise<AxiosInstance> {
+    const token = await this.generateAuthToken();
+
+    const client = axios.create({
+      baseURL: this.url.baseUrl,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return client;
+  }
+
+  /* ============================================================
+     API CALLER
+     ============================================================ */
+
+  /**
+   * Call Endpoint
+   * @param name
+   * @param params
+   * @param body
+   * @returns
+   */
+  public async callEndpoint<T>(
+    name: string,
+    params: Record<string, any> = {},
+    body?: Record<string, any>
+  ): Promise<AxiosResponse<T>> {
+    const endpointConfig = endpoints.find((e) => e.name === name);
+    if (!endpointConfig) {
+      throw new SatuSehatErrorUrlNotFound(name);
+    }
+
+    let path = endpointConfig.path;
+    Object.entries(params).forEach(([key, value]) => {
+      path = path.replace(`{${key}}`, String(value));
+    });
+
+    const client = await this.createClient();
+
+    try {
+      switch (endpointConfig.method) {
+        case "GET":
+          return client.get<T>(path);
+
+        case "POST":
+          return client.post<T>(path, body);
+
+        case "PUT":
+          return client.put<T>(path, body);
+
+        case "DELETE":
+          return client.delete<T>(path, { data: body });
+
+        default:
+          throw new SatuSehatErrorUrlNotFound(name);
+      }
+    } catch (error) {
+      throw new SatuSehatErrorFactory(error);
     }
   }
 }

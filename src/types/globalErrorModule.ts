@@ -43,6 +43,18 @@ export class SatuSehatErrorUrlNotFound extends SatuSehatError {
     );
   }
 }
+export class SatuSehatErrorInvalidQuery extends SatuSehatError {
+  constructor(endpointName?: string, queryParams?: string[]) {
+    super(
+      `Invalid query parameters for endpoint: ${
+        endpointName || "unknown"
+      } - ${queryParams?.join(", ")} `,
+      "INVALID_QUERY",
+      400,
+      undefined
+    );
+  }
+}
 
 export class SatuSehatErrorFactory {
   static fromAxios(error: AxiosError): SatuSehatError {

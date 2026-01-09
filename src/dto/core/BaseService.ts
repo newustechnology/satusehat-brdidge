@@ -5,10 +5,11 @@ import {
   SatuSehatErrorAuthError,
   SatuSehatErrorCacheError,
   SatuSehatErrorFactory,
+  SatuSehatErrorInvalidQuery,
   SatuSehatErrorUrlNotFound,
 } from "../../types/globalErrorModule";
 import { OAuthTokenResponse } from "../../types/auth";
-import { endpoints } from "../../config/enpoint";
+import { EndpointName, endpoints } from "../../config/enpoint";
 
 export class BaseService {
   private readonly url: { auth: string; baseUrl: string };
@@ -147,35 +148,59 @@ export class BaseService {
    * @returns
    */
   public async callEndpoint<T>(
-    name: string,
+    name: EndpointName,
     params: Record<string, any> = {},
-    body?: Record<string, any>
+    query?: Record<string, any>,
+    body?: Record<string, any>,
+    headers?: Record<string, string>
   ): Promise<AxiosResponse<T>> {
     const endpointConfig = endpoints.find((e) => e.name === name);
     if (!endpointConfig) {
       throw new SatuSehatErrorUrlNotFound(name);
     }
 
-    let path = endpointConfig.path;
+    let path = endpointConfig.path as string;
     Object.entries(params).forEach(([key, value]) => {
       path = path.replace(`{${key}}`, String(value));
     });
+    if (query && Object.keys(query).length > 0) {
+      const queryKeys = Object.keys(query);
+      const hasInvalidKey = queryKeys.some(
+        (key) => !(endpointConfig.query as readonly string[]).includes(key)
+      );
+      if (hasInvalidKey) {
+        throw new SatuSehatErrorInvalidQuery(name, queryKeys);
+      }
+
+      const queryString = new URLSearchParams(
+        query as Record<string, string>
+      ).toString();
+      path += `?${queryString}`;
+    }
 
     const client = await this.createClient();
 
     try {
-      switch (endpointConfig.method) {
+      switch (endpointConfig.method as "GET" | "POST" | "PUT" | "DELETE") {
         case "GET":
-          return client.get<T>(path);
+          return client.get<T>(path, {
+            ...(headers && { headers }),
+          });
 
         case "POST":
-          return client.post<T>(path, body);
-
+          return client.post<T>(path, body, {
+            ...(headers && { headers }),
+          });
         case "PUT":
-          return client.put<T>(path, body);
+          return client.put<T>(path, body, {
+            ...(headers && { headers }),
+          });
 
         case "DELETE":
-          return client.delete<T>(path, { data: body });
+          return client.delete<T>(path, {
+            data: body,
+            ...(headers && { headers }),
+          });
 
         default:
           throw new SatuSehatErrorUrlNotFound(name);

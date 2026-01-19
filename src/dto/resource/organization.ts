@@ -1,4 +1,9 @@
 import { contactPurpose, organizationTypes } from "../../constan";
+import {
+  FhirOrganization,
+  OrganizationInput,
+  OrganizationUpdateInput,
+} from "../../types/dto/resource/organozation";
 import { DtoCore } from "../core/DtoCore";
 
 export class OrganizationDto extends DtoCore {
@@ -8,7 +13,7 @@ export class OrganizationDto extends DtoCore {
 
   private buildOrganization(
     data: OrganizationInput | OrganizationUpdateInput,
-    withId = false
+    withId = false,
   ): FhirOrganization {
     return {
       resourceType: "Organization",
@@ -41,7 +46,11 @@ export class OrganizationDto extends DtoCore {
         email: data.email ? [data.email] : undefined,
         url: data.url ? [data.url] : undefined,
       }),
-      address: this.buildAddress(data),
+      address: this.buildAddress({
+        use: "work",
+        type: "both",
+        ...data,
+      }),
       partOf: data.partOf
         ? { reference: `Organization/${data.partOf}` }
         : undefined,
@@ -57,7 +66,7 @@ export class OrganizationDto extends DtoCore {
   }
 
   formatOrganizationDataUpdate(
-    data: OrganizationUpdateInput
+    data: OrganizationUpdateInput,
   ): FhirOrganization {
     return this.buildOrganization(data, true);
   }

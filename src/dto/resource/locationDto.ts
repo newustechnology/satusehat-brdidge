@@ -1,4 +1,10 @@
 import { physicalType } from "../../constan";
+import { FhirCoding, FhirIdentifier } from "../../types/dto/core";
+import {
+  FhirLocation,
+  FhirPhysicalTypeCode,
+  LocationDtoInput,
+} from "../../types/dto/resource/location";
 import { DtoCore } from "../core/DtoCore";
 
 export class LocationDto extends DtoCore {
@@ -31,7 +37,7 @@ export class LocationDto extends DtoCore {
 
   private buildLocationData(
     data: LocationDtoInput,
-    withId: boolean = false
+    withId: boolean = false,
   ): FhirLocation {
     return {
       resourceType: "Location",
@@ -42,7 +48,9 @@ export class LocationDto extends DtoCore {
       }),
       status: data.status,
       telecom: data.telecom ? this.buildTelecom(data.telecom) : undefined,
-      address: data.address ? this.buildAddress(data.address)[0] : undefined,
+      address: data.address
+        ? this.buildAddress({ use: "work", type: "both", ...data.address })[0]
+        : undefined,
       physicalType: this.buildPhysicalType(data.physicalType),
       position: data.position,
       managingOrganization: {

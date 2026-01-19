@@ -1,11 +1,19 @@
 import { contactPurpose } from "../../constan";
+import {
+  ContactPurposeCode,
+  FhirAddress,
+  FhirContactPoint,
+  TelecomInputArray,
+  TelecomInputSimple,
+  TelecomItem,
+} from "../../types/dto/core";
 
 export class DtoCore {
   // private pushTelecomItems
   private pushTelecomItems = (
     result: FhirContactPoint[],
     system: FhirContactPoint["system"],
-    items?: TelecomItem[]
+    items?: TelecomItem[],
   ) => {
     if (!items) return;
     items.forEach(({ value, use }) => {
@@ -18,7 +26,7 @@ export class DtoCore {
    * @returns
    */
   protected buildTelecom(
-    data: TelecomInputSimple | TelecomInputArray[]
+    data: TelecomInputSimple | TelecomInputArray[],
   ): FhirContactPoint[] {
     const result: FhirContactPoint[] = [];
 
@@ -53,6 +61,8 @@ export class DtoCore {
   }
 
   protected buildAddress(data: {
+    use: "work" | "home" | "temp" | "old" | "billing";
+    type: "postal" | "physical" | "both";
     street?: string;
     city?: string;
     postalCode?: string;
@@ -68,8 +78,8 @@ export class DtoCore {
 
     return [
       {
-        use: "work",
-        type: "both",
+        use: data.use,
+        type: data.type,
         line: [data.street],
         city: data.city,
         postalCode: data.postalCode,
@@ -106,7 +116,7 @@ export class DtoCore {
       phone?: string;
       email?: string;
       url?: string;
-    }>
+    }>,
   ) {
     if (!contact?.length) return undefined;
 

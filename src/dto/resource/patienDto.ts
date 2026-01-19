@@ -1,4 +1,18 @@
 import { maritalStatus } from "../../constan";
+import {
+  FhirCodeableConcept,
+  FhirHumanName,
+  FhirIdentifier,
+} from "../../types/dto/core";
+import {
+  CreatePatientInput,
+  ExistingPatient,
+  FhirPatchPatient,
+  FhirPatient,
+  MariedStatusIdentifier,
+  MaritalStatusCode,
+  PatchPatientInput,
+} from "../../types/dto/resource/patient";
 import { DtoCore } from "../core/DtoCore";
 
 export class PatientDto extends DtoCore {
@@ -14,7 +28,7 @@ export class PatientDto extends DtoCore {
       kk?: string;
       ihs?: string;
     },
-    newBorn: boolean = false
+    newBorn: boolean = false,
   ): Array<FhirIdentifier> {
     const identifiers: Array<FhirIdentifier> = [];
 
@@ -81,10 +95,10 @@ export class PatientDto extends DtoCore {
    * @returns
    */
   private buildMaritalStatus(
-    maritalStatusIdentifier: MariedStatusIdentifier
+    maritalStatusIdentifier: MariedStatusIdentifier,
   ): FhirCodeableConcept<MaritalStatusCode> {
     const status = maritalStatus.find(
-      (status) => status.identifier === maritalStatusIdentifier
+      (status) => status.identifier === maritalStatusIdentifier,
     );
 
     return {
@@ -131,7 +145,7 @@ export class PatientDto extends DtoCore {
    */
   formatCreatePayload(
     createBy: "nik" | "mother_nik",
-    data: CreatePatientInput
+    data: CreatePatientInput,
   ): FhirPatient {
     return {
       resourceType: "Patient",
@@ -145,7 +159,7 @@ export class PatientDto extends DtoCore {
           nik: data.nik,
           kk: data.kk,
         },
-        createBy === "mother_nik"
+        createBy === "mother_nik",
       ),
 
       name: this.buildName(data.name),
@@ -159,7 +173,11 @@ export class PatientDto extends DtoCore {
       deceasedBoolean: data.deceased,
       deceasedDateTime: data.deceasedDateTime,
 
-      address: this.buildAddress(data.address),
+      address: this.buildAddress({
+        use: "home",
+        type: "both",
+        ...data.address,
+      }),
 
       maritalStatus: data.maritalStatus
         ? this.buildMaritalStatus(data.maritalStatus)
@@ -201,11 +219,11 @@ export class PatientDto extends DtoCore {
    */
   fromatPatchPayload(
     data: PatchPatientInput,
-    existingData: ExistingPatient
+    existingData: ExistingPatient,
   ): FhirPatchPatient[] {
     if (!data || !existingData) {
       throw new Error(
-        "⚠️ Data baru dan data lama wajib disediakan untuk PATCH penuh."
+        "⚠️ Data baru dan data lama wajib disediakan untuk PATCH penuh.",
       );
     }
 
@@ -246,7 +264,7 @@ export class PatientDto extends DtoCore {
     if (data.nik || data.ihs) {
       if (!existingData.identifier) {
         throw new Error(
-          "⚠️ Field 'identifier' lama tidak ditemukan. PATCH dibatalkan."
+          "⚠️ Field 'identifier' lama tidak ditemukan. PATCH dibatalkan.",
         );
       }
 
@@ -296,11 +314,15 @@ export class PatientDto extends DtoCore {
     if (data.address) {
       if (!existingData.address) {
         throw new Error(
-          "⚠️ Field 'address' lama tidak ditemukan. PATCH dibatalkan."
+          "⚠️ Field 'address' lama tidak ditemukan. PATCH dibatalkan.",
         );
       }
 
-      const newAddress = this.buildAddress(data.address);
+      const newAddress = this.buildAddress({
+        use: "home",
+        type: "both",
+        ...data.address,
+      });
 
       patchOps.push({
         op: "test",

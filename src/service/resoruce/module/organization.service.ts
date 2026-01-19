@@ -59,11 +59,28 @@ export class OrganizationService {
     return response.data;
   }
 
-  async getById(id: string): Promise<any> {
+  async getById(id: string): Promise<FhirOrganization> {
     const response = await this.parentService.callEndpoint<FhirOrganization>(
       `/Organization/${id}`,
       "GET",
       undefined,
+      {
+        "Content-Type": "application/json",
+      },
+    );
+
+    return response.data;
+  }
+
+  async updateOrganization(
+    data: OrganizationInput & { id: string },
+  ): Promise<FhirOrganization> {
+    const dto = this.dto.formatOrganizationDataUpdate(data);
+
+    const response = await this.parentService.callEndpoint<FhirOrganization>(
+      `/Organization/${data.id}`,
+      "PUT",
+      dto,
       {
         "Content-Type": "application/json",
       },

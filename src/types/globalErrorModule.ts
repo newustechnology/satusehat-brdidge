@@ -124,6 +124,8 @@ export class SatuSehatErrorFactory {
       return originalError;
     };
 
+    console.log(message);
+
     return new SatuSehatError(
       message,
       error.code,
@@ -138,7 +140,7 @@ export class SatuSehatErrorFactory {
 
   constructor(error: unknown) {
     if (this.isAxiosError(error)) {
-      SatuSehatErrorFactory.fromAxios(error);
+      throw SatuSehatErrorFactory.fromAxios(error);
     }
     throw new SatuSehatError(
       (error as Error).message || "Unknown error",

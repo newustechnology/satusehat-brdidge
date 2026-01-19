@@ -2,10 +2,13 @@ import { redisClient } from "./lib/redis";
 import { ResourceService } from "./service/resoruce/resourceService";
 import { SatuSehatError } from "./types/globalErrorModule";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 const resorce = new ResourceService(
   {
-    client_id: "_test_client_id_",
-    client_secret: "_test_client_secret_",
+    client_id: process.env.CLIENT_ID || "",
+    client_secret: process.env.CLIENT_SECRET || "",
     module: "sandbox",
   },
   redisClient,
@@ -14,7 +17,7 @@ const resorce = new ResourceService(
 // cek organization
 async function cekOrganization() {
   const org = await resorce.organization.serchOrganizationBy({
-    partOf: "ed35f0b4-3a9b-440e-878c-dddc2613c431",
+    partOf: process.env.ORG_ID || "",
   });
 
   console.log(JSON.stringify(org, null, 2));
@@ -24,14 +27,12 @@ async function cekOrganization() {
 
 async function getOrganizationById() {
   try {
-    const org = await resorce.organization.getById(
-      "ed35f0b4-3a9b-440e-878c-dddc2613c43",
-    );
+    const org = await resorce.organization.getById(process.env.ORG_ID || "");
 
     console.log(JSON.stringify(org, null, 2));
   } catch (error) {
     if (error instanceof SatuSehatError) {
-      console.error("Error:", error.message);
+      console.error("Error:", error.toJSON());
     }
   }
 }

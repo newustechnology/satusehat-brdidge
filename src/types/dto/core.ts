@@ -393,3 +393,47 @@ export interface FhirPatchOutput {
   path: string;
   value: any;
 }
+
+// output endpoints
+export interface DataArray<T> {
+  entry: Entry<T>[];
+  link: {
+    relation: string;
+    url: string;
+  }[];
+  resourceType: string;
+  total: number;
+  type: string;
+}
+
+interface Entry<T> {
+  fullUrl: string;
+  resource: T;
+}
+
+// error output
+export type FhirError = {
+  resourceType: string;
+  issue: Issue[];
+};
+
+export type Issue = {
+  severity?: string;
+  code?: string;
+  diagnostics?: string;
+  details?: {
+    text?: string;
+  };
+  expression?: string[];
+};
+
+export interface FhirFaultError {
+  fault?: {
+    faultstring: string;
+    detail: {
+      errorcode: string;
+    };
+  };
+  ErrorCode?: string;
+  Error?: string;
+}

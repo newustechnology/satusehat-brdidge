@@ -1,15 +1,18 @@
 import Redis from "ioredis";
-import axios, { Axios, AxiosInstance, AxiosResponse } from "axios";
-import { BaseConfig, baseUrls } from "../../config/BaseConfig";
+import axios, { Axios, AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import { BaseConfig, baseUrls } from "../config/BaseConfig";
 import {
   SatuSehatErrorAuthError,
   SatuSehatErrorCacheError,
   SatuSehatErrorFactory,
   SatuSehatErrorInvalidQuery,
+  SatuSehatErrorOperationOutcome,
   SatuSehatErrorUrlNotFound,
-} from "../../types/globalErrorModule";
-import { OAuthTokenResponse } from "../../types/auth";
-import { EndpointName, endpoints } from "../../config/enpoint";
+} from "../types/globalErrorModule";
+import { OAuthTokenResponse } from "../types/auth";
+import { FhirError } from "../types/dto/core";
+
+const CACHEKEY = "auth_token";
 
 export class BaseService {
   private readonly url: { auth: string; baseUrl: string };
@@ -29,11 +32,11 @@ export class BaseService {
     this.redisPrefix = `satusehat_bridge_${config.client_id}`;
 
     this.redis.on("connect", () =>
-      console.info("[SATUSEHAT] ✅ Redis connected")
+      console.info("[SATUSEHAT] ✅ Redis connected"),
     );
 
     this.redis.on("error", (err) =>
-      console.error("[SATUSEHAT] ❌ Redis error:", err)
+      console.error("[SATUSEHAT] ❌ Redis error:", err),
     );
   }
 
@@ -48,7 +51,7 @@ export class BaseService {
   private async set<T>(
     key: string,
     value: T,
-    ttlSeconds: number = 3600
+    ttlSeconds: number = 3600,
   ): Promise<void> {
     try {
       const data =
@@ -58,7 +61,7 @@ export class BaseService {
     } catch (error) {
       throw new SatuSehatErrorCacheError(
         "Gagal menyimpan data ke Redis",
-        error
+        error,
       );
     }
   }
@@ -85,16 +88,13 @@ export class BaseService {
      ============================================================ */
 
   protected async generateAuthToken(): Promise<string> {
-    const cacheKey = "auth_token";
-
-    const cachedToken = await this.get(cacheKey);
+    const cachedToken = await this.get(CACHEKEY);
     if (cachedToken) return cachedToken;
 
     try {
       const { data } = await axios.post<OAuthTokenResponse>(
-        `${this.url.auth}/accesstoken`,
+        `${this.url.auth}/accesstoken?grant_type=client_credentials`,
         new URLSearchParams({
-          grant_type: "client_credentials",
           client_id: this.config.client_id,
           client_secret: this.config.client_secret,
         }),
@@ -102,7 +102,7 @@ export class BaseService {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-        }
+        },
       );
 
       if (!data?.access_token) {
@@ -111,7 +111,7 @@ export class BaseService {
 
       const ttl = Math.max(Number(data.expires_in) - 60, 60);
 
-      await this.set(cacheKey, data.access_token, ttl);
+      await this.set(CACHEKEY, data.access_token, ttl);
 
       return data.access_token;
     } catch (error) {
@@ -126,12 +126,52 @@ export class BaseService {
   private async createClient(): Promise<AxiosInstance> {
     const token = await this.generateAuthToken();
 
+    console.log("✅ Generated Auth Token:", token);
+
     const client = axios.create({
       baseURL: this.url.baseUrl,
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    // interceptors response
+    client.interceptors.response.use(
+      (response: AxiosResponse) => {
+        if (
+          !response.data ||
+          response.data.resourceType === "OperationOutcome"
+        ) {
+          const data = response.data as FhirError;
+
+          const message =
+            data.issue
+              ?.map(
+                (i) =>
+                  `${i.severity} - ${i.code}${i.diagnostics ? `: ${i.diagnostics}` : ""}`,
+              )
+              .join(", ") || "FHIR OperationOutcome";
+
+          const error = new AxiosError(
+            message,
+            "FHIR_OPERATION_OUTCOME",
+            response.config,
+            undefined,
+            response,
+          );
+
+          return Promise.reject(error); // ❗ INI BARU BENAR
+        }
+
+        return response;
+      },
+      async (error: AxiosError) => {
+        if (error.status === 401) {
+          await this.del(CACHEKEY);
+        }
+        return Promise.reject(error); // ❗ WAJIB return
+      },
+    );
 
     return client;
   }
@@ -148,62 +188,38 @@ export class BaseService {
    * @returns
    */
   public async callEndpoint<T>(
-    name: EndpointName,
-    params: Record<string, any> = {},
-    query?: Record<string, any>,
+    endpoint: string,
+    method: "GET" | "POST" | "PUT" | "DELETE",
     body?: Record<string, any>,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<AxiosResponse<T>> {
-    const endpointConfig = endpoints.find((e) => e.name === name);
-    if (!endpointConfig) {
-      throw new SatuSehatErrorUrlNotFound(name);
-    }
-
-    let path = endpointConfig.path as string;
-    Object.entries(params).forEach(([key, value]) => {
-      path = path.replace(`{${key}}`, String(value));
-    });
-    if (query && Object.keys(query).length > 0) {
-      const queryKeys = Object.keys(query);
-      const hasInvalidKey = queryKeys.some(
-        (key) => !(endpointConfig.query as readonly string[]).includes(key)
-      );
-      if (hasInvalidKey) {
-        throw new SatuSehatErrorInvalidQuery(name, queryKeys);
-      }
-
-      const queryString = new URLSearchParams(
-        query as Record<string, string>
-      ).toString();
-      path += `?${queryString}`;
-    }
-
-    const client = await this.createClient();
+    let path = endpoint;
 
     try {
-      switch (endpointConfig.method as "GET" | "POST" | "PUT" | "DELETE") {
+      const client = await this.createClient();
+      switch (method) {
         case "GET":
-          return client.get<T>(path, {
+          return await client.get<T>(path, {
             ...(headers && { headers }),
           });
 
         case "POST":
-          return client.post<T>(path, body, {
+          return await client.post<T>(path, body, {
             ...(headers && { headers }),
           });
         case "PUT":
-          return client.put<T>(path, body, {
+          return await client.put<T>(path, body, {
             ...(headers && { headers }),
           });
 
         case "DELETE":
-          return client.delete<T>(path, {
+          return await client.delete<T>(path, {
             data: body,
             ...(headers && { headers }),
           });
 
         default:
-          throw new SatuSehatErrorUrlNotFound(name);
+          throw new SatuSehatErrorUrlNotFound(endpoint);
       }
     } catch (error) {
       throw new SatuSehatErrorFactory(error);

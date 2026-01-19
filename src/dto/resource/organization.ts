@@ -1,4 +1,4 @@
-import { contactPurpose, organizationTypes } from "../../constan";
+import { organizationTypes } from "../../constan";
 import {
   FhirOrganization,
   OrganizationInput,

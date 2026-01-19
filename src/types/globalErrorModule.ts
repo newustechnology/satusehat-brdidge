@@ -1,11 +1,12 @@
 import axios, { AxiosError } from "axios";
+import { FhirError, FhirFaultError } from "./dto/core";
 
 export class SatuSehatError extends Error {
   constructor(
     message: string,
     public code?: string,
     public statusCode?: number,
-    public originalError?: any
+    public originalError?: any,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -39,10 +40,17 @@ export class SatuSehatErrorUrlNotFound extends SatuSehatError {
       `Endpoint URL not found for endpoint: ${endpointName || "unknown"}`,
       "URL_NOT_FOUND",
       404,
-      undefined
+      undefined,
     );
   }
 }
+
+export class SatuSehatErrorOperationOutcome extends SatuSehatError {
+  constructor(message: string, originalError?: any) {
+    super(message, "OPERATION_OUTCOME", 400, originalError);
+  }
+}
+
 export class SatuSehatErrorInvalidQuery extends SatuSehatError {
   constructor(endpointName?: string, queryParams?: string[]) {
     super(
@@ -51,7 +59,7 @@ export class SatuSehatErrorInvalidQuery extends SatuSehatError {
       } - ${queryParams?.join(", ")} `,
       "INVALID_QUERY",
       400,
-      undefined
+      undefined,
     );
   }
 }
@@ -59,35 +67,50 @@ export class SatuSehatErrorInvalidQuery extends SatuSehatError {
 export class SatuSehatErrorFactory {
   static fromAxios(error: AxiosError): SatuSehatError {
     const status = error.response?.status;
-    const payload = error.response?.data;
+    const payload = error.response?.data as
+      | FhirError
+      | FhirFaultError
+      | undefined;
 
-    console.error("❌ OAuth Axios Error", {
+    const url = `${error.config?.method} : ${error.config?.baseURL || ""}${error.config?.url}`;
+
+    let message = `HTTP ${status || "UNKNOWN"} ${url || "UNKNOWN_URL"}`;
+
+    // cek pyaload as FHIR Error
+    if (payload && "issue" in payload) {
+      const issues = payload.issue
+        .map(
+          (i) =>
+            `${i.severity || "unknown"} - ${i.code || "unknown"}${
+              i.diagnostics ? `: diagnosyics -> ${i.diagnostics}` : ""
+            }`,
+        )
+        .join(", ");
+      message += ` | Issues: ${issues}`;
+    } else if (payload && "fault" in payload) {
+      message += ` | Fault: ${payload.fault}${
+        payload.fault?.faultstring ? ` - ${payload.fault.faultstring}` : ""
+      }`;
+    } else if (payload && "Error" in payload) {
+      message += ` | Error: ${payload.Error}${
+        payload.ErrorCode ? ` - ${payload.ErrorCode}` : ""
+      }`;
+    } else if (error.message) {
+      message += ` | Message: ${error.message}`;
+    }
+
+    console.error("❌ Api Error", {
       status,
-      payload,
-      url: error.config?.url,
+      message,
+      payload: JSON.stringify(payload, null, 2),
+      url,
       method: error.config?.method,
     });
-
-    const safeParsedMessage = (data: any): string => {
-      if (!data) return "Unknown error response from server";
-
-      if (typeof data === "string") {
-        return data;
-      } else if (data.error_description) {
-        return data.error_description;
-      } else if (data.error && typeof data.error === "string") {
-        return data.error;
-      } else if (data.message) {
-        return data.message;
-      } else {
-        return "Unknown error response from server";
-      }
-    };
 
     const safeParsedOriginalError = (
       data: any,
       url?: string,
-      method?: string
+      method?: string,
     ): {
       url?: string;
       method?: string;
@@ -102,10 +125,10 @@ export class SatuSehatErrorFactory {
     };
 
     return new SatuSehatError(
-      safeParsedMessage(payload),
+      message,
       error.code,
       status || 500,
-      safeParsedOriginalError(payload, error.config?.url, error.config?.method)
+      safeParsedOriginalError(payload, error.config?.url, error.config?.method),
     );
   }
 
@@ -121,7 +144,7 @@ export class SatuSehatErrorFactory {
       (error as Error).message || "Unknown error",
       (error as SatuSehatError).code || "SATUSEHAT_ERROR",
       (error as SatuSehatError).statusCode || 500,
-      (error as SatuSehatError).originalError || error
+      (error as SatuSehatError).originalError || error,
     );
   }
 }

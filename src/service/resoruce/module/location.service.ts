@@ -1,6 +1,9 @@
 import { LocationDto } from "../../../dto/resource/locationDto";
 import { DataArray } from "../../../types/dto/core";
-import { FhirLocation } from "../../../types/dto/resource/location";
+import {
+  FhirLocation,
+  LocationDtoInput,
+} from "../../../types/dto/resource/location";
 import { SatuSehatParamsError } from "../../../types/globalErrorModule";
 import { ResourceService } from "../resource.service";
 
@@ -75,6 +78,38 @@ export class LocationService {
       },
     );
 
+    return response.data;
+  }
+
+  async createLocation(data: LocationDtoInput): Promise<FhirLocation> {
+    const dto = this.dto.fromartCreateLocationData(data);
+
+    const response = await this.parentService.callEndpoint<FhirLocation>(
+      "/Location",
+      "POST",
+      dto,
+      {
+        "Content-Type": "application/json",
+      },
+    );
+
+    return response.data;
+  }
+
+  async updateLocation(
+    id: string,
+    data: LocationDtoInput,
+  ): Promise<FhirLocation> {
+    const dto = this.dto.fromartCreateLocationData(data);
+
+    const response = await this.parentService.callEndpoint<FhirLocation>(
+      `/Location/${id}`,
+      "PUT",
+      dto,
+      {
+        "Content-Type": "application/json",
+      },
+    );
     return response.data;
   }
 }

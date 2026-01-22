@@ -14,36 +14,13 @@ const resorce = new ResourceService(
   redisClient,
 );
 
-// cek organization
-async function cekOrganization() {
-  const org = await resorce.organization.serchOrganizationBy({
-    partOf: process.env.ORG_ID || "",
-  });
-
-  console.log(JSON.stringify(org, null, 2));
-}
-
-// cekOrganization();
-
-async function getOrganizationById() {
+async function locationBy() {
   try {
-    const org = await resorce.organization.getById("");
-
-    console.log(JSON.stringify(org, null, 2));
-  } catch (error) {
-    if (error instanceof SatuSehatError) {
-      console.error("Error:", JSON.stringify(error, null, 2));
-    }
-  }
-}
-
-async function searchPatientBy() {
-  try {
-    const org = await resorce.patient.searchPatientBy(
+    const org = await resorce.location.searchLocationBy(
       {
-        nik: "1234567890123456",
+        organization: process.env.ORG_ID || "",
       },
-      "nik",
+      "organization",
     );
 
     console.log(JSON.stringify(org, null, 2));
@@ -53,10 +30,10 @@ async function searchPatientBy() {
     }
   }
 }
-async function getPatientById() {
+async function locationById() {
   try {
-    const org = await resorce.patient.getById(
-      "a1e2de99-afd8-4a5c-96d4-0aa6760f25a9",
+    const org = await resorce.location.getById(
+      "9e0d0581-f330-40bb-8e57-8a38b404b28b",
     );
 
     console.log(JSON.stringify(org, null, 2));
@@ -67,16 +44,19 @@ async function getPatientById() {
   }
 }
 
-getPatientById().finally(() => {
+async function callEndpoint() {
+  try {
+    const org = await resorce.callEndpoint("", "GET", undefined, undefined);
+
+    console.log(JSON.stringify(org, null, 2));
+  } catch (error) {
+    if (error instanceof SatuSehatError) {
+      console.error("Error:", JSON.stringify(error, null, 2));
+    }
+  }
+}
+
+locationById().finally(() => {
   console.log("Closing Redis connection...");
   redisClient.quit();
 });
-// resorce
-//   .callEndpoint("RelatedPerson/a1e2de99-afd8-4a5c-96d4-0aa6760f25a9", "GET")
-//   .then((response) => {
-//     console.log(JSON.stringify(response.data, null, 2));
-//   })
-//   .finally(() => {
-//     console.log("Closing Redis connection...");
-//     redisClient.quit();
-//   });

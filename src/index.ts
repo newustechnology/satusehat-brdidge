@@ -44,9 +44,14 @@ async function locationById() {
   }
 }
 
-async function callEndpoint() {
+async function practisionerBy() {
   try {
-    const org = await resorce.callEndpoint("", "GET", undefined, undefined);
+    const org = await resorce.practisioner.searchPractisionerBy(
+      {
+        nik: "7209061211900001",
+      },
+      "nik",
+    );
 
     console.log(JSON.stringify(org, null, 2));
   } catch (error) {
@@ -56,7 +61,26 @@ async function callEndpoint() {
   }
 }
 
-locationById().finally(() => {
+async function callEndpoint() {
+  try {
+    const org = await resorce.callEndpoint(
+      "https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1/Practitioner/923e0393-1a90-400c-b4d6-7084727f2b71",
+      "GET",
+      undefined,
+      undefined,
+    );
+
+    console.log(org.data);
+
+    console.log(JSON.stringify(org, null, 2));
+  } catch (error) {
+    if (error instanceof SatuSehatError) {
+      console.error("Error:", JSON.stringify(error, null, 2));
+    }
+  }
+}
+
+callEndpoint().finally(() => {
   console.log("Closing Redis connection...");
   redisClient.quit();
 });

@@ -1,8 +1,4 @@
 import { DataArray } from "../../../types/dto/core";
-import {
-  FhirLocation,
-  LocationDtoInput,
-} from "../../../types/dto/resource/location";
 import { FhirPractisioner } from "../../../types/dto/resource/practisioner";
 import { SatuSehatParamsError } from "../../../types/globalErrorModule";
 import { ResourceService } from "../resource.service";
@@ -10,7 +6,7 @@ import { ResourceService } from "../resource.service";
 export class PractisionerService {
   constructor(private parentService: ResourceService) {}
 
-  async searchLocationBy(
+  async searchPractisionerBy(
     data: {
       name?: string;
       nik?: string;
@@ -31,7 +27,7 @@ export class PractisionerService {
       params.append("name", data.name);
       params.append(
         "identifier",
-        `http://sys-ids.kemkes.go.id/patient|${data.nik}`,
+        `https://fhir.kemkes.go.id/id/nik|${data.nik}`,
       );
     }
 
@@ -43,7 +39,7 @@ export class PractisionerService {
       }
       params.append(
         "identifier",
-        `http://sys-ids.kemkes.go.id/patient|${data.nik}`,
+        `https://fhir.kemkes.go.id/id/nik|${data.nik}`,
       );
     }
 

@@ -4,7 +4,7 @@ import {
   FhirOrganization,
   OrganizationInput,
 } from "../../../types/dto/resource/organozation";
-import { ResourceService } from "../resourceService";
+import { ResourceService } from "../resource.service";
 
 export class OrganizationService {
   private dto: OrganizationDto;

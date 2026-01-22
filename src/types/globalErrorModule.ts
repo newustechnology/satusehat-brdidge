@@ -64,6 +64,17 @@ export class SatuSehatErrorInvalidQuery extends SatuSehatError {
   }
 }
 
+export class SatuSehatParamsError extends SatuSehatError {
+  constructor(message: string, field?: string[]) {
+    super(
+      message,
+      "PARAMS_ERROR",
+      400,
+      field?.map((f) => ({ field: f, reason: "parameter is required" })),
+    );
+  }
+}
+
 export class SatuSehatErrorFactory {
   static fromAxios(error: AxiosError): SatuSehatError {
     const status = error.response?.status;

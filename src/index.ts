@@ -27,7 +27,7 @@ async function cekOrganization() {
 
 async function getOrganizationById() {
   try {
-    const org = await resorce.organization.getById(process.env.ORG_ID || "");
+    const org = await resorce.organization.getById("");
 
     console.log(JSON.stringify(org, null, 2));
   } catch (error) {

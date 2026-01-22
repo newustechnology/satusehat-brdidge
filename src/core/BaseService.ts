@@ -189,7 +189,7 @@ export class BaseService {
    */
   public async callEndpoint<T>(
     endpoint: string,
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     body?: Record<string, any>,
     headers?: Record<string, string>,
   ): Promise<AxiosResponse<T>> {
@@ -209,6 +209,11 @@ export class BaseService {
           });
         case "PUT":
           return await client.put<T>(path, body, {
+            ...(headers && { headers }),
+          });
+
+        case "PATCH":
+          return await client.patch<T>(path, body, {
             ...(headers && { headers }),
           });
 

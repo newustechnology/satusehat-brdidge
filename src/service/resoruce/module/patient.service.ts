@@ -1,6 +1,11 @@
 import { PatientDto } from "../../../dto/resource/patienDto";
 import { DataArray } from "../../../types/dto/core";
-import { FhirPatient } from "../../../types/dto/resource/patient";
+import {
+  CreatePatientInput,
+  ExistingPatient,
+  FhirPatient,
+  PatchPatientInput,
+} from "../../../types/dto/resource/patient";
 import { SatuSehatParamsError } from "../../../types/globalErrorModule";
 import { ResourceService } from "../resource.service";
 
@@ -117,6 +122,43 @@ export class PatientService {
       undefined,
       {
         "Content-Type": "application/json",
+      },
+    );
+
+    return response.data;
+  }
+
+  async createPatient(
+    data: CreatePatientInput,
+    createBy: "nik" | "mother_nik",
+  ): Promise<any> {
+    const dto = this.dto.formatCreatePayload(createBy, data);
+
+    const response = await this.parentService.callEndpoint<FhirPatient>(
+      "/Patient",
+      "POST",
+      dto,
+      {
+        "Content-Type": "application/json",
+      },
+    );
+
+    return response.data;
+  }
+
+  async patchPatient(
+    id: string,
+    data: PatchPatientInput,
+    existingData: ExistingPatient,
+  ): Promise<any> {
+    const dto = this.dto.fromatPatchPayload(data, existingData);
+
+    const response = await this.parentService.callEndpoint<FhirPatient>(
+      `/Patient/${id}`,
+      "PATCH",
+      dto,
+      {
+        "Content-Type": "application/json-patch+json",
       },
     );
 

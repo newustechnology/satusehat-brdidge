@@ -371,8 +371,8 @@ export interface FhirMeta<D = string, C = string> {
 }
 
 // FHIR Special: Narrative
-export interface FhirNarrative {
-  status: string;
+export interface FhirNarrative<D = string> {
+  status: D;
   div: string; // XHTML string
 }
 

@@ -326,3 +326,228 @@ export const daysOfWeek = [
   { code: "sat", display: "Sabtu" },
   { code: "sun", display: "Minggu" },
 ] as const;
+
+export const encounterType = [
+  {
+    code: "ADMS",
+    display: "Annual diabetes mellitus screening",
+  },
+  {
+    code: "BD/BM-clin",
+    display: "Bone drilling/bone marrow punction in clinic",
+  },
+  {
+    code: "CCS60",
+    display: "Infant colon screening - 60 minutes",
+  },
+  {
+    code: "OKI",
+    display: "Outpatient Kenacort injection",
+  },
+] as const;
+
+export * from "./enconterServicetype";
+
+export const admitSource = [
+  {
+    code: "hosp-trans",
+    display: "Transferred from other hospital",
+    definition:
+      "The Patient has been transferred from another hospital for this encounter.",
+  },
+  {
+    code: "emd",
+    display: "From accident/emergency department",
+    definition:
+      "The patient has been transferred from the emergency department within the hospital. This is typically used in the transition to an inpatient encounter",
+  },
+  {
+    code: "outp",
+    display: "From outpatient department",
+    definition:
+      "The patient has been transferred from an outpatient department within the hospital.",
+  },
+  {
+    code: "born",
+    display: "Born in hospital",
+    definition:
+      "The patient is a newborn and the encounter will track the baby related activities (as opposed to the Mothers encounter - that may be associated using the newborn encounters partof property)",
+  },
+  {
+    code: "gp",
+    display: "General Practitioner referral",
+    definition:
+      "The patient has been admitted due to a referred from a General Practitioner.",
+  },
+  {
+    code: "mp",
+    display: "Medical Practitioner/physician referral",
+    definition:
+      "The patient has been admitted due to a referred from a Specialist (as opposed to a General Practitioner).",
+  },
+  {
+    code: "nursing",
+    display: "From nursing home",
+    definition: "The patient has been transferred from a nursing home.",
+  },
+  {
+    code: "psych",
+    display: "From psychiatric hospital",
+    definition: "The patient has been transferred from a psychiatric facility.",
+  },
+  {
+    code: "rehab",
+    display: "From rehabilitation facility",
+    definition:
+      "The patient has been transferred from a rehabilitation facility or clinic.",
+  },
+  {
+    code: "other",
+    display: "Other",
+    definition:
+      "The patient has been admitted from a source otherwise not specified here.",
+  },
+] as const;
+
+export const reAdmission = [
+  {
+    code: "R",
+    display: "Re-admission",
+    definition: "Re-admission",
+  },
+] as const;
+
+export const dietPreference = [
+  {
+    code: "vegetarian",
+    display: "Vegetarian",
+    definition: "Food without meat, poultry or seafood.",
+  },
+  {
+    code: "dairy-free",
+    display: "Dairy Free",
+    definition: "Excludes dairy products.",
+  },
+  {
+    code: "nut-free",
+    display: "Nut Free",
+    definition: "Excludes ingredients containing nuts.",
+  },
+  {
+    code: "gluten-free",
+    display: "Gluten Free",
+    definition: "Excludes ingredients containing gluten.",
+  },
+  {
+    code: "vegan",
+    display: "Vegan",
+    definition:
+      "Food without meat, poultry, seafood, eggs, dairy products and other animal-derived substances.",
+  },
+  {
+    code: "halal",
+    display: "Halal",
+    definition: "Foods that conform to Islamic law.",
+  },
+  {
+    code: "kosher",
+    display: "Kosher",
+    definition: "Foods that conform to Jewish dietary law.",
+  },
+] as const;
+
+export const specialArrangement = [
+  {
+    code: "wheel",
+    display: "Wheelchair",
+    definition:
+      "The patient requires a wheelchair to be made available for the encounter.",
+  },
+  {
+    code: "add-bed",
+    display: "Additional bedding",
+    definition:
+      "An additional bed made available for a person accompanying the patient, for example a parent accompanying a child.",
+  },
+  {
+    code: "int",
+    display: "Interpreter",
+    definition:
+      "The patient is not fluent in the local language and requires an interpreter to be available. Refer to the Patient.Language property for the type of interpreter required.",
+  },
+  {
+    code: "att",
+    display: "Attendant",
+    definition:
+      "A person who accompanies a patient to provide assistive services necessary for the patient's care during the encounter.",
+  },
+  {
+    code: "dog",
+    display: "Guide dog",
+    definition:
+      "The patient has a guide dog and the location used for the encounter should be able to support the presence of the service animal.",
+  },
+] as const;
+
+export const dischargeDisposition = [
+  {
+    code: "home",
+    display: "Home",
+    definition:
+      "The patient was dicharged and has indicated that they are going to return home afterwards.",
+  },
+  {
+    code: "alt-home",
+    display: "Alternative home",
+    definition:
+      "The patient was discharged and has indicated that they are going to return home afterwards, but not the patient's home - e.g. a family member's home.",
+  },
+  {
+    code: "other-hcf",
+    display: "Other healthcare facility",
+    definition: "The patient was transferred to another healthcare facility.",
+  },
+  {
+    code: "hosp",
+    display: "Hospice",
+    definition: "The patient has been discharged into palliative care.",
+  },
+  {
+    code: "long",
+    display: "Long-term care",
+    definition:
+      "The patient has been discharged into long-term care where is likely to be monitored through an ongoing episode-of-care.",
+  },
+  {
+    code: "aadvice",
+    display: "Left against advice",
+    definition: "The patient self discharged against medical advice.",
+  },
+  {
+    code: "exp",
+    display: "Expired",
+    definition: "The patient has deceased during this encounter.",
+  },
+  {
+    code: "psy",
+    display: "Psychiatric hospital",
+    definition: "The patient has been transferred to a psychiatric facility.",
+  },
+  {
+    code: "rehab",
+    display: "Rehabilitation",
+    definition:
+      "The patient was discharged and is to receive post acute care rehabilitation services.",
+  },
+  {
+    code: "snf",
+    display: "Skilled nursing facility",
+    definition:
+      "The patient has been discharged to a skilled nursing facility for the patient to receive additional care.",
+  },
+  {
+    code: "oth",
+    display: "Other",
+    definition: "The discharge disposition has not otherwise defined.",
+  },
+] as const;

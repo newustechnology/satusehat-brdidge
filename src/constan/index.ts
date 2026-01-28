@@ -551,3 +551,82 @@ export const dischargeDisposition = [
     definition: "The discharge disposition has not otherwise defined.",
   },
 ] as const;
+
+export const clinicalStatus = [
+  {
+    code: "active",
+    display: "Active",
+  },
+  {
+    code: "recurrence",
+    display: "Recurrence",
+  },
+  {
+    code: "relapse",
+    display: "Relapse",
+  },
+  {
+    code: "inactive",
+    display: "Inactive",
+  },
+  {
+    code: "remission",
+    display: "Remission",
+  },
+  {
+    code: "resolved",
+    display: "Resolved",
+  },
+  {
+    code: "unknown",
+    display: "Unknown",
+  },
+] as const;
+
+export const verificationStatus = [
+  {
+    code: "unconfirmed",
+    display: "Unconfirmed",
+  },
+  {
+    code: "provisional",
+    display: "Provisional",
+  },
+  {
+    code: "differential",
+    display: "Differential",
+  },
+  {
+    code: "confirmed",
+    display: "Confirmed",
+  },
+  {
+    code: "refuted",
+    display: "Refuted",
+  },
+  {
+    code: "entered-in-error",
+    display: "Entered in Error",
+  },
+] as const;
+
+export const conditionCategory = [
+  {
+    code: "problem-list-item",
+    display: "Problem List Item",
+    definition:
+      "An item on a problem list that can be managed over time and can be expressed by a practitioner (e.g. physician, nurse), patient, or related person.",
+  },
+  {
+    code: "encounter-diagnosis",
+    display: "Encounter Diagnosis",
+    definition:
+      "A point in time diagnosis (e.g. from a physician or nurse) in context of an encounter.",
+  },
+  {
+    code: "diagnostic-report-impression",
+    display: "Diagnostic Report Impression",
+    definition:
+      "A diagnosis or differential diagnosis item that is expressed in a diagnostic report.",
+  },
+] as const;

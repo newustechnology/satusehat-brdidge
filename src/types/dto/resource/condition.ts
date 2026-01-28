@@ -5,6 +5,7 @@ import {
 } from "../../../constan";
 import {
   FhirCodeableConcept,
+  FhirCore,
   FhirIdentifier,
   FhirPeriod,
   FhirRange,
@@ -19,7 +20,8 @@ export type ConditionVerificationStatusCode =
 
 export type ConditionCategoryCode = (typeof conditionCategory)[number]["code"];
 
-export interface FhirCondition {
+export interface FhirCondition extends FhirCore {
+  resourceType: "Condition";
   identifier?: Array<FhirIdentifier>;
   clinicalStatus?: FhirCodeableConcept<ConditionClinicalStatusCode>;
   verificationStatus?: FhirCodeableConcept<ConditionVerificationStatusCode>;

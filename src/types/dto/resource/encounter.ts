@@ -10,6 +10,7 @@ import {
 import {
   FhirCodeableConcept,
   FhirCoding,
+  FhirCore,
   FhirIdentifier,
   FhirPeriod,
   FhirReference,
@@ -28,7 +29,8 @@ export type EncounterSpecialArrangementCode =
 export type EncounterDischargeDispositionCode =
   (typeof dischargeDisposition)[number]["code"];
 
-export interface FhirEncounter {
+export interface FhirEncounter extends FhirCore {
+  resourceType: "Encounter";
   identifier?: Array<FhirIdentifier>;
   status?: string;
   statusHistory?: Array<{

@@ -4,6 +4,7 @@ import {
   FhirAddress,
   FhirCodeableConcept,
   FhirContactPoint,
+  FhirCore,
   FhirHumanName,
   FhirIdentifier,
   FhirReference,
@@ -47,9 +48,8 @@ export interface OrganizationUpdateInput extends OrganizationInput {
 }
 
 // output fhir organization
-export interface FhirOrganization {
+export interface FhirOrganization extends FhirCore {
   resourceType?: "Organization";
-  id?: string;
   active?: boolean;
 
   identifier?: Array<FhirIdentifier>;

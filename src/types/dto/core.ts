@@ -437,3 +437,7 @@ export interface FhirFaultError {
   ErrorCode?: string;
   Error?: string;
 }
+
+export interface FhirCore {
+  id?: string;
+}

@@ -5,6 +5,7 @@ import {
   FhirCodeableConcept,
   FhirCoding,
   FhirContactPoint,
+  FhirCore,
   FhirIdentifier,
   FhirReference,
   TelecomInputArray,
@@ -34,9 +35,8 @@ export interface LocationDtoInput {
   };
 }
 
-export interface FhirLocation {
+export interface FhirLocation extends FhirCore {
   resourceType?: "Location";
-  id?: string;
   identifier?: Array<FhirIdentifier>;
   status?: "active" | "suspended" | "inactive";
   operationalStatus?: FhirCoding<FhirOperationalStatusCode>;

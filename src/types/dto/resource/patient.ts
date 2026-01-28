@@ -6,6 +6,7 @@ import {
   FhirAttachment,
   FhirCodeableConcept,
   FhirContactPoint,
+  FhirCore,
   FhirHumanName,
   FhirIdentifier,
   FhirPeriod,
@@ -105,7 +106,7 @@ export interface FhirPatchPatient {
 }
 
 // output fhir patient
-export interface FhirPatient {
+export interface FhirPatient extends FhirCore {
   resourceType: "Patient";
   meta: {
     profile: string[];

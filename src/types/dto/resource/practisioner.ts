@@ -3,15 +3,15 @@ import {
   FhirAttachment,
   FhirCodeableConcept,
   FhirContactPoint,
+  FhirCore,
   FhirHumanName,
   FhirIdentifier,
   FhirPeriod,
   FhirReference,
 } from "../core";
 
-export interface FhirPractisioner {
+export interface FhirPractisioner extends FhirCore {
   resourceType?: "Practitioner";
-  id?: string;
   identifier?: Array<FhirIdentifier>;
   active?: boolean;
   name?: Array<FhirHumanName>;

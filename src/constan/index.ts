@@ -985,3 +985,52 @@ export const sectionTextCode = [
       'The contents of the narrative are some equivalent of "No human-readable text provided in this case".',
   },
 ] as const;
+
+export const procedureEventStatus = [
+  {
+    code: "preparation",
+    display: "Preparation",
+    definition:
+      "The core event has not started yet, but some staging activities have begun (e.g. surgical suite preparation).  Preparation stages may be tracked for billing purposes.",
+  },
+  {
+    code: "in-progress",
+    display: "In Progress",
+    definition: "The event is currently occurring.",
+  },
+  {
+    code: "not-done",
+    display: "Not Done",
+    definition:
+      "The event was terminated prior to any activity beyond preparation.  I.e. The 'main' activity has not yet begun.  The boundary between preparatory and the 'main' activity is context-specific.",
+  },
+  {
+    code: "on-hold",
+    display: "On Hold",
+    definition:
+      "The event has been temporarily stopped but is expected to resume in the future.",
+  },
+  {
+    code: "stopped",
+    display: "Stopped",
+    definition:
+      "The event was terminated prior to the full completion of the intended activity but after at least some of the 'main' activity (beyond preparation) has occurred.",
+  },
+  {
+    code: "completed",
+    display: "Completed",
+    definition: "The event has now concluded.",
+  },
+  {
+    code: "entered-in-error",
+    display: "Entered in Error",
+    definition:
+      'This electronic record should never have existed, though it is possible that real-world decisions were based on it.  (If real-world activity has occurred, the status should be "stopped" rather than "entered-in-error".).',
+  },
+  {
+    code: "unknown",
+    display: "Unknown",
+    definition:
+      'The authoring/source system does not know which of the status values currently applies for this event.  Note: This concept is not to be used for "other" - one of the listed statuses is presumed to apply,  but the authoring/source system does not know which.',
+  },
+] as const;

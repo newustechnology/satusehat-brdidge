@@ -360,6 +360,13 @@ export interface FhirExtension {
   value?: any;
 }
 
+export interface FhirSimpleQuantity {
+  value: number;
+  unit: string;
+  system: string;
+  code: string;
+}
+
 // FHIR Special: Meta
 export interface FhirMeta<D = string, C = string> {
   versionId?: string;

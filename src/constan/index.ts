@@ -1034,3 +1034,198 @@ export const procedureEventStatus = [
       'The authoring/source system does not know which of the status values currently applies for this event.  Note: This concept is not to be used for "other" - one of the listed statuses is presumed to apply,  but the authoring/source system does not know which.',
   },
 ] as const;
+
+export const medicationRequestStatus = [
+  {
+    code: "active",
+    display: "Active",
+    definition:
+      "The request is 'actionable', but not all actions that are implied by it have occurred yet.",
+  },
+  {
+    code: "on-hold",
+    display: "On Hold",
+    definition:
+      "Actions implied by the request are to be temporarily halted. The request might or might not be resumed. May also be called 'suspended'.",
+  },
+  {
+    code: "ended",
+    display: "Ended",
+    definition:
+      "The request is no longer active and the subject should no longer be taking the medication.",
+    concept: [
+      {
+        code: "stopped",
+        display: "Stopped",
+        definition:
+          "Actions implied by the request are to be permanently halted, before all of the administrations occurred. This should not be used if the original order was entered in error",
+      },
+      {
+        code: "completed",
+        display: "Completed",
+        definition:
+          "All actions that are implied by the request have occurred.",
+      },
+      {
+        code: "cancelled",
+        display: "Cancelled",
+        definition:
+          "The request has been withdrawn before any administrations have occurred",
+      },
+    ],
+  },
+  {
+    code: "entered-in-error",
+    display: "Entered in Error",
+    definition:
+      "The request was recorded against the wrong patient or for some reason should not have been recorded (e.g. wrong medication, wrong dose, etc.). Some of the actions that are implied by the medication request may have occurred. For example, the medication may have been dispensed and the patient may have taken some of the medication.",
+  },
+  {
+    code: "draft",
+    display: "Draft",
+    definition:
+      "The request is not yet 'actionable', e.g. it is a work in progress, requires sign-off, verification\u00a0or\u00a0needs to be run through decision support process.",
+  },
+  {
+    code: "unknown",
+    display: "Unknown",
+    definition:
+      "The authoring/source system does not know which of the status values currently applies for this request. Note: This concept is not to be used for 'other' - one of the listed statuses is presumed to apply, but the authoring/source system does not know which.",
+  },
+] as const;
+
+export const medicationStatusReason = [
+  {
+    code: "altchoice",
+    display: "Try another treatment first",
+    definition:
+      "This therapy has been ordered as a backup to a preferred therapy. This order will be released when and if the preferred therapy is unsuccessful.",
+  },
+  {
+    code: "clarif",
+    display: "Prescription requires clarification",
+    definition: "Clarification is required before the order can be acted upon.",
+  },
+  {
+    code: "drughigh",
+    display: "Drug level too high",
+    definition:
+      "The current level of the medication in the patient's system is too high. The medication is suspended to allow the level to subside to a safer level.",
+  },
+  {
+    code: "hospadm",
+    display: "Admission to hospital",
+    definition:
+      "The patient has been admitted to a care facility and their community medications are suspended until hospital discharge.",
+  },
+  {
+    code: "labint",
+    display: "Lab interference issues",
+    definition:
+      "The therapy would interfere with a planned lab test and the therapy is being withdrawn until the test is completed.",
+  },
+  {
+    code: "non-avail",
+    display: "Patient not available",
+    definition:
+      "Patient not available for a period of time due to a scheduled therapy, leave of absence or other reason.",
+  },
+  {
+    code: "preg",
+    display: "Parent is pregnant/breast feeding",
+    definition:
+      "The patient is pregnant or breast feeding. The therapy will be resumed when the pregnancy is complete and the patient is no longer breastfeeding.",
+  },
+  {
+    code: "salg",
+    display: "Allergy",
+    definition:
+      "The patient is believed to be allergic to a substance that is part of the therapy and the therapy is being temporarily withdrawn to confirm.",
+  },
+  {
+    code: "sddi",
+    display: "Drug interacts with another drug",
+    definition:
+      "The drug interacts with a short-term treatment that is more urgently required. This order will be resumed when the short-term treatment is complete.",
+  },
+  {
+    code: "sdupther",
+    display: "Duplicate therapy",
+    definition:
+      "The drug interacts with a short-term treatment that is more urgently required. This order will be resumed when the short-term treatment is complete.",
+  },
+  {
+    code: "sintol",
+    display: "Suspected intolerance",
+    definition:
+      "The drug interacts with a short-term treatment that is more urgently required. This order will be resumed when the short-term treatment is complete.",
+  },
+  {
+    code: "surg",
+    display: "Patient scheduled for surgery.",
+    definition:
+      "The drug is contraindicated for patients receiving surgery and the patient is scheduled to be admitted for surgery in the near future. The drug will be resumed when the patient has sufficiently recovered from the surgery.",
+  },
+  {
+    code: "washout",
+    display: "Waiting for old drug to wash out",
+    definition:
+      "The patient was previously receiving a medication contraindicated with the current medication. The current medication will remain on hold until the prior medication has been cleansed from their system.",
+  },
+] as const;
+
+export const intentStatus = [
+  {
+    code: "proposal",
+    display: "Proposal",
+  },
+  {
+    code: "plan",
+    display: "Plan",
+  },
+  {
+    code: "order",
+    display: "Order",
+  },
+  {
+    code: "original-order",
+    display: "Original Order",
+  },
+  {
+    code: "reflex-order",
+    display: "Reflex Order",
+  },
+  {
+    code: "filler-order",
+    display: "Filler Order",
+  },
+  {
+    code: "instance-order",
+    display: "Instance Order",
+  },
+  {
+    code: "option",
+    display: "Option",
+  },
+] as const;
+
+export const courseOfTherapyType = [
+  {
+    code: "continuous",
+    display: "Continuous long term therapy",
+    definition:
+      "A medication which is expected to be continued beyond the present order and which the patient should be assumed to be taking unless explicitly stopped.",
+  },
+  {
+    code: "acute",
+    display: "Short course (acute) therapy",
+    definition:
+      "A medication which the patient is only expected to consume for the duration of the current order and which is not expected to be renewed.",
+  },
+  {
+    code: "seasonal",
+    display: "Seasonal",
+    definition:
+      "A medication which is expected to be used on a part time basis at certain times of the year",
+  },
+] as const;

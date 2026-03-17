@@ -3,7 +3,7 @@ import { DataArray } from "../../../types/dto/core";
 import {
   FhirOrganization,
   OrganizationInput,
-} from "../../../types/dto/resource/organozation";
+} from "../../../types/dto/resource/organization";
 import { ResourceService } from "../resource.service";
 
 export class OrganizationService {

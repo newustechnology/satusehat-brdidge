@@ -3,7 +3,7 @@ import {
   FhirOrganization,
   OrganizationInput,
   OrganizationUpdateInput,
-} from "../../types/dto/resource/organozation";
+} from "../../types/dto/resource/organization";
 import { DtoCore } from "../core/DtoCore";
 
 export class OrganizationDto extends DtoCore {

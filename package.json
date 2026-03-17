@@ -23,7 +23,10 @@
     "build": "tsc -p tsconfig.json",
     "test": "npx jest --detectOpenHandles",
     "prepare": "npm run build",
-    "release": "npm version patch && git push && git push --tags"
+    "release": "npm version patch && git push && git push --tags",
+    "release:beta": "npm version prerelease --preid=beta && git push && git push --tags",
+    "publish:public": "npm run build && npm publish --access public",
+    "publish:beta": "npm run build && npm publish --tag beta --access public"
   },
   "dependencies": {
     "axios": "^1.13.2",

@@ -1,176 +1,188 @@
 import { FhirCore } from "../core";
 
-export interface CreateObservationInput {
+export interface CreateAllergyIntoleranceInput {
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
-  status?: string;
-  category?: Array<{
+  clinicalStatus?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  }>;
+  };
+  verificationStatus?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<string>;
   code?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
-  subject?: {
+  patient?: {
     reference?: string;
+    display?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
-  performer?: Array<{
+  recordedDate?: string;
+  recorder?: {
     reference?: string;
-  }>;
-  valueCodeableConcept?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
   };
 
 }
 
-export interface PatchObservationInput {
+export interface PatchAllergyIntoleranceInput {
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
-  status?: string;
-  category?: Array<{
+  clinicalStatus?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  }>;
+  };
+  verificationStatus?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<string>;
   code?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
-  subject?: {
+  patient?: {
     reference?: string;
+    display?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
-  performer?: Array<{
+  recordedDate?: string;
+  recorder?: {
     reference?: string;
-  }>;
-  valueCodeableConcept?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
   };
 
 }
 
-export interface ExistingObservation {
+export interface ExistingAllergyIntolerance {
   id?: string;
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
-  status?: string;
-  category?: Array<{
+  clinicalStatus?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  }>;
+  };
+  verificationStatus?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<string>;
   code?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
-  subject?: {
+  patient?: {
     reference?: string;
+    display?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
-  performer?: Array<{
+  recordedDate?: string;
+  recorder?: {
     reference?: string;
-  }>;
-  valueCodeableConcept?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
   };
 
 }
 
-export interface FhirPatchObservation {
+export interface FhirPatchAllergyIntolerance {
   op: "replace" | "test";
   path: string;
   value: any;
 }
 
-export interface FhirObservation extends FhirCore {
-  resourceType: "Observation";
+export interface FhirAllergyIntolerance extends FhirCore {
+  resourceType: "AllergyIntolerance";
   meta?: {
     profile: string[];
   };
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
-  status?: string;
-  category?: Array<{
+  clinicalStatus?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  }>;
+  };
+  verificationStatus?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<string>;
   code?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
-  subject?: {
+  patient?: {
     reference?: string;
+    display?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
-  performer?: Array<{
+  recordedDate?: string;
+  recorder?: {
     reference?: string;
-  }>;
-  valueCodeableConcept?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
   };
 
 }

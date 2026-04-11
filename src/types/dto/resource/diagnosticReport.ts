@@ -1,8 +1,9 @@
 import { FhirCore } from "../core";
 
-export interface CreateObservationInput {
+export interface CreateDiagnosticReportInput {
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
   status?: string;
@@ -31,19 +32,26 @@ export interface CreateObservationInput {
   performer?: Array<{
     reference?: string;
   }>;
-  valueCodeableConcept?: {
+  result?: Array<{
+    reference?: string;
+  }>;
+  specimen?: Array<{
+    reference?: string;
+  }>;
+  conclusionCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+  }>;
 
 }
 
-export interface PatchObservationInput {
+export interface PatchDiagnosticReportInput {
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
   status?: string;
@@ -72,20 +80,27 @@ export interface PatchObservationInput {
   performer?: Array<{
     reference?: string;
   }>;
-  valueCodeableConcept?: {
+  result?: Array<{
+    reference?: string;
+  }>;
+  specimen?: Array<{
+    reference?: string;
+  }>;
+  conclusionCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+  }>;
 
 }
 
-export interface ExistingObservation {
+export interface ExistingDiagnosticReport {
   id?: string;
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
   status?: string;
@@ -114,29 +129,36 @@ export interface ExistingObservation {
   performer?: Array<{
     reference?: string;
   }>;
-  valueCodeableConcept?: {
+  result?: Array<{
+    reference?: string;
+  }>;
+  specimen?: Array<{
+    reference?: string;
+  }>;
+  conclusionCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+  }>;
 
 }
 
-export interface FhirPatchObservation {
+export interface FhirPatchDiagnosticReport {
   op: "replace" | "test";
   path: string;
   value: any;
 }
 
-export interface FhirObservation extends FhirCore {
-  resourceType: "Observation";
+export interface FhirDiagnosticReport extends FhirCore {
+  resourceType: "DiagnosticReport";
   meta?: {
     profile: string[];
   };
   identifier?: Array<{
     system?: string;
+    use?: string;
     value?: string;
   }>;
   status?: string;
@@ -165,12 +187,18 @@ export interface FhirObservation extends FhirCore {
   performer?: Array<{
     reference?: string;
   }>;
-  valueCodeableConcept?: {
+  result?: Array<{
+    reference?: string;
+  }>;
+  specimen?: Array<{
+    reference?: string;
+  }>;
+  conclusionCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+  }>;
 
 }

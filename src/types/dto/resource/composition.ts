@@ -1,64 +1,224 @@
-import {
-  attesterMode,
-  compositionStatus,
-  relatesToCodes,
-  sectionTextCode,
-} from "../../../constan";
-import {
-  FhirCodeableConcept,
-  FhirCore,
-  FhirIdentifier,
-  FhirNarrative,
-  FhirPeriod,
-  FhirReference,
-} from "../core";
+import { FhirCore } from "../core";
 
-export type CompositionStatusCode = (typeof compositionStatus)[number]["code"];
-export type CompositionAttesterModeCode = (typeof attesterMode)[number]["code"];
-export type CompositionRelatesToCode = (typeof relatesToCodes)[number]["code"];
-export type CompositionSectionTextCode =
-  (typeof sectionTextCode)[number]["code"];
+export interface CreateCompositionInput {
+  identifier?: {
+    system?: string;
+    value?: string;
+  };
+  status?: string;
+  type?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  encounter?: {
+    reference?: string;
+    display?: string;
+  };
+  date?: string;
+  author?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  title?: string;
+  custodian?: {
+    reference?: string;
+  };
+  section?: Array<{
+    code?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
+    text?: {
+      status?: string;
+      div?: string;
+    };
+  }>;
+
+}
+
+export interface PatchCompositionInput {
+  identifier?: {
+    system?: string;
+    value?: string;
+  };
+  status?: string;
+  type?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  encounter?: {
+    reference?: string;
+    display?: string;
+  };
+  date?: string;
+  author?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  title?: string;
+  custodian?: {
+    reference?: string;
+  };
+  section?: Array<{
+    code?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
+    text?: {
+      status?: string;
+      div?: string;
+    };
+  }>;
+
+}
+
+export interface ExistingComposition {
+  id?: string;
+  identifier?: {
+    system?: string;
+    value?: string;
+  };
+  status?: string;
+  type?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  encounter?: {
+    reference?: string;
+    display?: string;
+  };
+  date?: string;
+  author?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  title?: string;
+  custodian?: {
+    reference?: string;
+  };
+  section?: Array<{
+    code?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
+    text?: {
+      status?: string;
+      div?: string;
+    };
+  }>;
+
+}
+
+export interface FhirPatchComposition {
+  op: "replace" | "test";
+  path: string;
+  value: any;
+}
 
 export interface FhirComposition extends FhirCore {
   resourceType: "Composition";
-  identifier?: Array<FhirIdentifier>;
-  status?: CompositionStatusCode;
-  type?: FhirCodeableConcept<string>;
-  category?: Array<FhirCodeableConcept<string>>;
-  subject?: FhirReference;
-  encounter?: FhirReference;
-  date?: string;
-  author?: Array<FhirReference>;
-  title?: string;
-  confidentiality?: string;
-  attester?: Array<{
-    mode?: CompositionAttesterModeCode;
-    time?: string;
-    party?: FhirReference;
+  meta?: {
+    profile: string[];
+  };
+  identifier?: {
+    system?: string;
+    value?: string;
+  };
+  status?: string;
+  type?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  };
+  category?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
   }>;
-  custodian?: FhirReference;
-  relatesTo?: Array<{
-    code?: CompositionRelatesToCode;
-    target?: {
-      targetIdentifier?: FhirIdentifier;
-      targetReference?: FhirReference;
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  encounter?: {
+    reference?: string;
+    display?: string;
+  };
+  date?: string;
+  author?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  title?: string;
+  custodian?: {
+    reference?: string;
+  };
+  section?: Array<{
+    code?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
+    text?: {
+      status?: string;
+      div?: string;
     };
   }>;
-  event?: Array<{
-    code?: Array<FhirCodeableConcept<string>>;
-    period?: FhirPeriod;
-    detail?: Array<FhirReference>;
-  }>;
-  section?: Array<{
-    title?: string;
-    code?: FhirCodeableConcept<string>;
-    author?: Array<FhirReference>;
-    focus?: any;
-    text?: FhirNarrative<CompositionSectionTextCode>;
-    mode?: "working" | "snapshot" | "changes";
-    orderedBy?: FhirCodeableConcept<string>;
-    entry?: Array<FhirReference>;
-    emptyReason?: FhirCodeableConcept<string>;
-    section?: Array<any>;
-  }>;
+
 }

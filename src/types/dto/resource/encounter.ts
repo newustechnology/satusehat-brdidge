@@ -1,82 +1,208 @@
-import {
-  admitSource,
-  dietPreference,
-  dischargeDisposition,
-  encounterServiceType,
-  encounterType,
-  reAdmission,
-  specialArrangement,
-} from "../../../constan";
-import {
-  FhirCodeableConcept,
-  FhirCoding,
-  FhirCore,
-  FhirIdentifier,
-  FhirPeriod,
-  FhirReference,
-} from "../core";
+import { FhirCore } from "../core";
 
-export type EncounterTypeCode = (typeof encounterType)[number]["code"];
-export type EncounterServiceTypeCode =
-  (typeof encounterServiceType)[number]["code"];
+export interface CreateEncounterInput {
+  status?: string;
+  class?: {
+    system?: string;
+    code?: string;
+    display?: string;
+  };
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  participant?: Array<{
+    type?: Array<{
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    }>;
+    individual?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  period?: {
+    start?: string;
+  };
+  location?: Array<{
+    location?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  statusHistory?: Array<{
+    status?: string;
+    period?: {
+      start?: string;
+    };
+  }>;
+  serviceProvider?: {
+    reference?: string;
+  };
+  identifier?: Array<{
+    system?: string;
+    value?: string;
+  }>;
 
-export type EncounterAdmitSourceCode = (typeof admitSource)[number]["code"];
-export type EncounterReAdmissionCode = (typeof reAdmission)[number]["code"];
-export type EncounterDietPreferenceCode =
-  (typeof dietPreference)[number]["code"];
-export type EncounterSpecialArrangementCode =
-  (typeof specialArrangement)[number]["code"];
-export type EncounterDischargeDispositionCode =
-  (typeof dischargeDisposition)[number]["code"];
+}
+
+export interface PatchEncounterInput {
+  status?: string;
+  class?: {
+    system?: string;
+    code?: string;
+    display?: string;
+  };
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  participant?: Array<{
+    type?: Array<{
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    }>;
+    individual?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  period?: {
+    start?: string;
+  };
+  location?: Array<{
+    location?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  statusHistory?: Array<{
+    status?: string;
+    period?: {
+      start?: string;
+    };
+  }>;
+  serviceProvider?: {
+    reference?: string;
+  };
+  identifier?: Array<{
+    system?: string;
+    value?: string;
+  }>;
+
+}
+
+export interface ExistingEncounter {
+  id?: string;
+  status?: string;
+  class?: {
+    system?: string;
+    code?: string;
+    display?: string;
+  };
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  participant?: Array<{
+    type?: Array<{
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    }>;
+    individual?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  period?: {
+    start?: string;
+  };
+  location?: Array<{
+    location?: {
+      reference?: string;
+      display?: string;
+    };
+  }>;
+  statusHistory?: Array<{
+    status?: string;
+    period?: {
+      start?: string;
+    };
+  }>;
+  serviceProvider?: {
+    reference?: string;
+  };
+  identifier?: Array<{
+    system?: string;
+    value?: string;
+  }>;
+
+}
+
+export interface FhirPatchEncounter {
+  op: "replace" | "test";
+  path: string;
+  value: any;
+}
 
 export interface FhirEncounter extends FhirCore {
   resourceType: "Encounter";
-  identifier?: Array<FhirIdentifier>;
-  status?: string;
-  statusHistory?: Array<{
-    status?: string;
-    period?: FhirPeriod;
-  }>;
-  class?: FhirCoding<string>;
-  classHistory?: Array<{
-    class?: FhirCoding<string>;
-    period?: FhirPeriod;
-  }>;
-  type?: Array<FhirCodeableConcept<EncounterTypeCode>>;
-  serviceType?: FhirCodeableConcept<EncounterServiceTypeCode>;
-  subject?: FhirReference;
-  episodeOfCare?: Array<FhirReference>;
-  basedOn?: Array<FhirReference>;
-  participant?: {
-    type?: Array<FhirCodeableConcept<string>>;
-    individual?: FhirReference;
+  meta?: {
+    profile: string[];
   };
-  period?: FhirPeriod;
-  length?: number;
-  reasonCode?: Array<FhirCodeableConcept<string>>;
-  reasonReference?: Array<FhirReference>;
-  diagnosis?: Array<{
-    condition?: FhirReference;
-    use?: FhirCodeableConcept<string>;
-    rank?: number;
+  status?: string;
+  class?: {
+    system?: string;
+    code?: string;
+    display?: string;
+  };
+  subject?: {
+    reference?: string;
+    display?: string;
+  };
+  participant?: Array<{
+    type?: Array<{
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    }>;
+    individual?: {
+      reference?: string;
+      display?: string;
+    };
   }>;
-  account?: Array<FhirReference>;
-  hospitalization?: {
-    preAdmissionIdentifier?: FhirIdentifier;
-    origin?: FhirReference;
-    admitSource?: FhirCodeableConcept<EncounterAdmitSourceCode>;
-    reAdmission?: FhirCodeableConcept<EncounterReAdmissionCode>;
-    dietPreference?: Array<FhirCodeableConcept<EncounterDietPreferenceCode>>;
-    specialArrangement?: Array<
-      FhirCodeableConcept<EncounterSpecialArrangementCode>
-    >;
-    destination?: FhirReference;
-    dischargeDisposition?: FhirCodeableConcept<EncounterDischargeDispositionCode>;
+  period?: {
+    start?: string;
   };
   location?: Array<{
-    location?: FhirReference;
-    extensions?: any;
+    location?: {
+      reference?: string;
+      display?: string;
+    };
   }>;
-  serviceProvider?: FhirReference;
-  partOf?: FhirReference;
+  statusHistory?: Array<{
+    status?: string;
+    period?: {
+      start?: string;
+    };
+  }>;
+  serviceProvider?: {
+    reference?: string;
+  };
+  identifier?: Array<{
+    system?: string;
+    value?: string;
+  }>;
+
 }

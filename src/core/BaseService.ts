@@ -93,10 +93,11 @@ export class BaseService {
 
     try {
       const { data } = await axios.post<OAuthTokenResponse>(
-        `${this.url.auth}/accesstoken?grant_type=client_credentials`,
+        `${this.url.auth}/accesstoken`,
         new URLSearchParams({
           client_id: this.config.client_id,
           client_secret: this.config.client_secret,
+          grant_type: "client_credentials",
         }),
         {
           headers: {

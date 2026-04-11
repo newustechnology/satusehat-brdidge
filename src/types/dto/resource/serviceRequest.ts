@@ -1,11 +1,13 @@
 import { FhirCore } from "../core";
 
-export interface CreateObservationInput {
+export interface CreateServiceRequestInput {
   identifier?: Array<{
     system?: string;
     value?: string;
   }>;
   status?: string;
+  intent?: string;
+  priority?: string;
   category?: Array<{
     coding?: Array<{
       system?: string;
@@ -19,34 +21,56 @@ export interface CreateObservationInput {
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
   subject?: {
     reference?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
+  occurrenceDateTime?: string;
+  authoredOn?: string;
+  requester?: {
+    reference?: string;
+    display?: string;
+  };
   performer?: Array<{
     reference?: string;
+    display?: string;
   }>;
-  valueCodeableConcept?: {
+  reasonCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+    text?: string;
+  }>;
+  locationCode?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  locationReference?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  patientInstruction?: string;
 
 }
 
-export interface PatchObservationInput {
+export interface PatchServiceRequestInput {
   identifier?: Array<{
     system?: string;
     value?: string;
   }>;
   status?: string;
+  intent?: string;
+  priority?: string;
   category?: Array<{
     coding?: Array<{
       system?: string;
@@ -60,35 +84,57 @@ export interface PatchObservationInput {
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
   subject?: {
     reference?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
+  occurrenceDateTime?: string;
+  authoredOn?: string;
+  requester?: {
+    reference?: string;
+    display?: string;
+  };
   performer?: Array<{
     reference?: string;
+    display?: string;
   }>;
-  valueCodeableConcept?: {
+  reasonCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+    text?: string;
+  }>;
+  locationCode?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  locationReference?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  patientInstruction?: string;
 
 }
 
-export interface ExistingObservation {
+export interface ExistingServiceRequest {
   id?: string;
   identifier?: Array<{
     system?: string;
     value?: string;
   }>;
   status?: string;
+  intent?: string;
+  priority?: string;
   category?: Array<{
     coding?: Array<{
       system?: string;
@@ -102,36 +148,56 @@ export interface ExistingObservation {
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
   subject?: {
     reference?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
+  occurrenceDateTime?: string;
+  authoredOn?: string;
+  requester?: {
+    reference?: string;
+    display?: string;
+  };
   performer?: Array<{
     reference?: string;
+    display?: string;
   }>;
-  valueCodeableConcept?: {
+  reasonCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+    text?: string;
+  }>;
+  locationCode?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  locationReference?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  patientInstruction?: string;
 
 }
 
-export interface FhirPatchObservation {
+export interface FhirPatchServiceRequest {
   op: "replace" | "test";
   path: string;
   value: any;
 }
 
-export interface FhirObservation extends FhirCore {
-  resourceType: "Observation";
+export interface FhirServiceRequest extends FhirCore {
+  resourceType: "ServiceRequest";
   meta?: {
     profile: string[];
   };
@@ -140,6 +206,8 @@ export interface FhirObservation extends FhirCore {
     value?: string;
   }>;
   status?: string;
+  intent?: string;
+  priority?: string;
   category?: Array<{
     coding?: Array<{
       system?: string;
@@ -153,24 +221,44 @@ export interface FhirObservation extends FhirCore {
       code?: string;
       display?: string;
     }>;
+    text?: string;
   };
   subject?: {
     reference?: string;
   };
   encounter?: {
     reference?: string;
+    display?: string;
   };
-  effectiveDateTime?: string;
-  issued?: string;
+  occurrenceDateTime?: string;
+  authoredOn?: string;
+  requester?: {
+    reference?: string;
+    display?: string;
+  };
   performer?: Array<{
     reference?: string;
+    display?: string;
   }>;
-  valueCodeableConcept?: {
+  reasonCode?: Array<{
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
-  };
+    text?: string;
+  }>;
+  locationCode?: Array<{
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
+  }>;
+  locationReference?: Array<{
+    reference?: string;
+    display?: string;
+  }>;
+  patientInstruction?: string;
 
 }

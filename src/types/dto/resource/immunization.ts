@@ -1,35 +1,36 @@
 import { FhirCore } from "../core";
 
-export interface CreateProcedureInput {
+export interface CreateImmunizationInput {
   status?: string;
-  category?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-    text?: string;
-  };
-  code?: {
+  vaccineCode?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
   };
-  subject?: {
+  patient?: {
     reference?: string;
     display?: string;
   };
-  encounter?: {
-    reference?: string;
-    display?: string;
-  };
-  performedPeriod?: {
-    start?: string;
-    end?: string;
+  occurrenceDateTime?: string;
+  recorded?: string;
+  primarySource?: boolean;
+  reportOrigin?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
   };
   performer?: Array<{
+    function?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
     actor?: {
       reference?: string;
       display?: string;
@@ -42,49 +43,46 @@ export interface CreateProcedureInput {
       display?: string;
     }>;
   }>;
-  bodySite?: Array<{
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-  }>;
-  note?: Array<{
-    text?: string;
+  location?: {
+    display?: string;
+  };
+  protocolApplied?: Array<{
+    doseNumberPositiveInt?: number;
   }>;
 
 }
 
-export interface PatchProcedureInput {
+export interface PatchImmunizationInput {
   status?: string;
-  category?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-    text?: string;
-  };
-  code?: {
+  vaccineCode?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
   };
-  subject?: {
+  patient?: {
     reference?: string;
     display?: string;
   };
-  encounter?: {
-    reference?: string;
-    display?: string;
-  };
-  performedPeriod?: {
-    start?: string;
-    end?: string;
+  occurrenceDateTime?: string;
+  recorded?: string;
+  primarySource?: boolean;
+  reportOrigin?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
   };
   performer?: Array<{
+    function?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
     actor?: {
       reference?: string;
       display?: string;
@@ -97,50 +95,47 @@ export interface PatchProcedureInput {
       display?: string;
     }>;
   }>;
-  bodySite?: Array<{
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-  }>;
-  note?: Array<{
-    text?: string;
+  location?: {
+    display?: string;
+  };
+  protocolApplied?: Array<{
+    doseNumberPositiveInt?: number;
   }>;
 
 }
 
-export interface ExistingProcedure {
+export interface ExistingImmunization {
   id?: string;
   status?: string;
-  category?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-    text?: string;
-  };
-  code?: {
+  vaccineCode?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
   };
-  subject?: {
+  patient?: {
     reference?: string;
     display?: string;
   };
-  encounter?: {
-    reference?: string;
-    display?: string;
-  };
-  performedPeriod?: {
-    start?: string;
-    end?: string;
+  occurrenceDateTime?: string;
+  recorded?: string;
+  primarySource?: boolean;
+  reportOrigin?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
   };
   performer?: Array<{
+    function?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
     actor?: {
       reference?: string;
       display?: string;
@@ -153,59 +148,56 @@ export interface ExistingProcedure {
       display?: string;
     }>;
   }>;
-  bodySite?: Array<{
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-  }>;
-  note?: Array<{
-    text?: string;
+  location?: {
+    display?: string;
+  };
+  protocolApplied?: Array<{
+    doseNumberPositiveInt?: number;
   }>;
 
 }
 
-export interface FhirPatchProcedure {
+export interface FhirPatchImmunization {
   op: "replace" | "test";
   path: string;
   value: any;
 }
 
-export interface FhirProcedure extends FhirCore {
-  resourceType: "Procedure";
+export interface FhirImmunization extends FhirCore {
+  resourceType: "Immunization";
   meta?: {
     profile: string[];
   };
   status?: string;
-  category?: {
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-    text?: string;
-  };
-  code?: {
+  vaccineCode?: {
     coding?: Array<{
       system?: string;
       code?: string;
       display?: string;
     }>;
   };
-  subject?: {
+  patient?: {
     reference?: string;
     display?: string;
   };
-  encounter?: {
-    reference?: string;
-    display?: string;
-  };
-  performedPeriod?: {
-    start?: string;
-    end?: string;
+  occurrenceDateTime?: string;
+  recorded?: string;
+  primarySource?: boolean;
+  reportOrigin?: {
+    coding?: Array<{
+      system?: string;
+      code?: string;
+      display?: string;
+    }>;
   };
   performer?: Array<{
+    function?: {
+      coding?: Array<{
+        system?: string;
+        code?: string;
+        display?: string;
+      }>;
+    };
     actor?: {
       reference?: string;
       display?: string;
@@ -218,15 +210,11 @@ export interface FhirProcedure extends FhirCore {
       display?: string;
     }>;
   }>;
-  bodySite?: Array<{
-    coding?: Array<{
-      system?: string;
-      code?: string;
-      display?: string;
-    }>;
-  }>;
-  note?: Array<{
-    text?: string;
+  location?: {
+    display?: string;
+  };
+  protocolApplied?: Array<{
+    doseNumberPositiveInt?: number;
   }>;
 
 }
